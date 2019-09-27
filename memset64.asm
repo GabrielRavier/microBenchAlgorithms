@@ -39,15 +39,15 @@ cloudLibcMemset:
 	mov rax, rdi
 	mov rcx, rdi
 	cmp rdx, 0x1F
-	jbe .l2
+	jbe .small
 
 	test al, 7
-	je .l10
+	je .aligned
 
 	mov edi, esi
 	mov r8, rax
 
-.l4:
+.alignLoop:
 	inc r8
 	mov rcx, rdx
 	sub rcx, r8
@@ -55,9 +55,9 @@ cloudLibcMemset:
 	mov [r8 - 1], dil
 
 	test r8b, 7
-	jne .l4
+	jne .alignLoop
 
-.l3:
+.afterAlignLoop:
 	movzx edx, sil
 	mov rcx, rdx
 	sal rcx, 8
@@ -75,12 +75,34 @@ cloudLibcMemset:
 	shr rcx, 3
 	lea rcx, [rcx * 8 + r8 + 8]
 
-.l5:
+.wordLoop:
 	add r8, 8
 	mov [r8 - 8], rdx
 
 	cmp rcx, r8
-	jne .l5
+	jne .wordLoop
+
+	mov rdx, r9
+	and edx, 7
+
+.small:
+	lea r8, [rcx + rdx]
+	test rdx, rdx
+	je .return
+
+.endLoop:
+	inc rcx
+	mov [rcx - 1], sil
+	cmp rcx, r8
+	jne .endLoop
+
+.return:
+	ret
+
+.aligned:
+	mov r8, rdi
+	mov r9, rdx
+	jmp .afterAlignLoop
 
 
 
