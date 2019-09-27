@@ -1,0 +1,9 @@
+# Executables
+memset32
+memset64
+
+# Object files
+*.o
+
+# Project files
+cmpMemStrFuncs.*
