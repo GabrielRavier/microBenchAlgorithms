@@ -1,4 +1,5 @@
 global pdclibMemset
+global cloudLibcMemset
 global klibcMemset
 global dietLibcMemset
 global uClibcMemset
@@ -9,7 +10,6 @@ global glibcMemset
 global glibcI586Memset
 global glibcI686Memset
 global asmlibMemset
-global bytewiseMemset
 global minixMemset
 global freeBsdMemset
 global inlineStringOpGccMemset
@@ -17,6 +17,7 @@ global inlineStringOpGccI386Memset
 global inlineStringOpGccI486Memset
 global inlineStringOpGccI686Memset
 global inlineStringOpGccNoconaMemset
+global bytewiseMemset
 
 section .text align=16
 
@@ -50,6 +51,92 @@ pdclibMemset:
 	pop ebx
 	pop esi
 	ret
+
+
+
+
+
+	align 16
+cloudLibcMemset:
+	push edi
+	push esi
+	push ebx
+	mov esi, [esp + 12 + DESTINATION]
+	mov ebx, [esp + 12 + LENGTH]
+	mov eax, esi
+
+	cmp ebx, 0xF
+	jbe .small
+
+	test esi, 3
+	je .aligned
+
+	movzx edi, byte [esp + 12 + FILL]
+	mov edx, esi
+
+.alignLoop:
+	inc edx
+	mov eax, edi
+	mov [edx - 1], al
+
+	mov eax, ebx
+	sub eax, edx
+	lea ecx, [esi + eax]
+
+	test dl, 3
+	jne .alignLoop
+
+.afterAlignLoop:
+	movzx eax, byte [esp + 12 + FILL]
+	mov ebx, eax
+	sal ebx, 8
+	or ebx, eax
+
+	mov eax, ebx
+	sal eax, 16
+	or ebx, eax
+
+	lea eax, [ecx - 4]
+	shr eax, 2
+	lea eax, [edx + 4 + eax * 4]
+
+.wordLoop:
+	add edx, 4
+	mov [edx - 4], ebx
+	cmp edx, eax
+	jne .wordLoop
+
+	and ecx, 3
+	mov ebx, ecx
+
+.small:
+	movzx edx, byte [esp + 12 + FILL]
+	lea ecx, [eax + ebx]
+	test ebx, ebx
+	je .return
+
+.smallLoop:
+	inc eax
+	mov [eax - 1], dl
+
+	cmp eax, ecx
+	jne .smallLoop
+
+.return:
+	pop ebx
+	mov eax, esi
+	pop esi
+	pop edi
+	ret
+
+.aligned:
+	mov edx, esi
+	mov ecx, ebx
+	jmp .afterAlignLoop
+
+
+
+
 
 	align 16
 klibcMemset:
@@ -1036,34 +1123,6 @@ asmlibMemset:
 
 
 	align 16
-bytewiseMemset:
-	push ebx
-	mov edx, [esp + 4 + LENGTH]
-	mov ebx, [esp + 4 + DESTINATION]
-	movzx ecx, byte [esp + 4 + FILL]
-
-	test edx, edx
-	je .return
-
-	add edx, ebx
-	mov eax, ebx
-
-.loop:
-	inc eax
-	mov [eax - 1], cl
-	cmp eax, edx
-	jne .loop
-
-.return:
-	mov eax, ebx
-	pop ebx
-	ret
-
-
-
-
-
-	align 16
 minixMemset:
 	push ebp
 	mov ebp, esp
@@ -1410,3 +1469,31 @@ inlineStringOpGccNoconaMemset:
 	stosw
 	sub edx, 2
 	jmp .aligned
+
+
+
+
+
+	align 16
+bytewiseMemset:
+	push ebx
+	mov edx, [esp + 4 + LENGTH]
+	mov ebx, [esp + 4 + DESTINATION]
+	movzx ecx, byte [esp + 4 + FILL]
+
+	test edx, edx
+	je .return
+
+	add edx, ebx
+	mov eax, ebx
+
+.loop:
+	mov [eax], cl
+	inc eax
+	cmp eax, edx
+	jne .loop
+
+.return:
+	mov eax, ebx
+	pop ebx
+	ret
