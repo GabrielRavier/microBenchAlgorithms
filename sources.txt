@@ -3,6 +3,9 @@ cloudlibc (https://github.com/NuxiNL/cloudlibc)
 sortix (https://gitlab.com/sortix/sortix/tree/master/libc)
 libc11 (libc11.org)
 klibc (https://kernel.googlesource.com/pub/scm/libs/klibc/klibc/+/refs/heads/master/usr/klibc/)
+avr-libc
+z80ddk libc
+6502 libc
 dietlibc (https://github.com/ensc/dietlibc)
 uClibc (https://github.com/wbx-github/uclibc-ng)
 newlib (https://github.com/bminor/newlib)
