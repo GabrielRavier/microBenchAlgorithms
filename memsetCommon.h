@@ -47,9 +47,9 @@ inline const char *alignedStr(bool aligned)
 	return aligned ? "aligned" : "unaligned";
 }
 
-inline char *alignByPowOf2(char *ptr, uintptr_t align)
+template <typename T> inline T *alignByPowOf2(T *ptr, uintptr_t align)
 {
-	return (char *)(((uintptr_t)ptr + (align - 1)) & -(align));
+	return (T *)(((uintptr_t)ptr + (align - 1)) & -(align));
 }
 
 inline void doOneBench(bool destinationAlign, size_t size, size_t times, memsetFunc memsetPtr, std::ostream& out, benchResult& result)
