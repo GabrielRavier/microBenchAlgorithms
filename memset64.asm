@@ -1,7 +1,8 @@
 global pdclibMemset
-global cloudLibcMemset
+global cloudlibcMemset
 global klibcMemset
-global dietLibcMemset
+global neatlibcMemset
+global dietlibcMemset
 global uClibcMemset
 global newlibMemset
 global muslMemset
@@ -35,7 +36,7 @@ pdclibMemset:
 
 
 	align 16
-cloudLibcMemset:
+cloudlibcMemset:
 	mov rax, rdi
 	mov rcx, rdi
 	cmp rdx, 0x1F
@@ -131,7 +132,21 @@ klibcMemset:
 
 
 	align 16
-dietLibcMemset:
+neatlibcMemset:
+	mov rcx, rdx
+	mov rax, rsi
+	mov rdx, rdi
+	cld
+	rep stosb
+	mov rax, rdx
+	ret
+
+
+
+
+
+	align 16
+dietlibcMemset:
 	movzx eax, sil
 	mov rsi, 0x101010101010101
 	imul rax, rsi

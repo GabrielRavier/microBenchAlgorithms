@@ -4,8 +4,10 @@ extern "C"
 {
 #define mkMemsetDecl(x) void *x(void *, int, size_t);
 	mkMemsetDecl(pdclibMemset)
-	mkMemsetDecl(cloudLibcMemset)
-	mkMemsetDecl(dietLibcMemset)
+	mkMemsetDecl(cloudlibcMemset)
+	mkMemsetDecl(klibcMemset)
+	mkMemsetDecl(neatlibcMemset)
+	mkMemsetDecl(dietlibcMemset)
 	mkMemsetDecl(uClibcMemset)
 	mkMemsetDecl(newlibMemset)
 	mkMemsetDecl(muslMemset)
@@ -28,8 +30,10 @@ const static memsetFunc funcs[] =
 {
 	{memset, "system libc memset"},
 	{pdclibMemset, "pdclib memset"},
-	{cloudLibcMemset, "cloudlibc memset"},
-	{dietLibcMemset, "dietlibc memset"},
+	{cloudlibcMemset, "cloudlibc memset"},
+	{klibcMemset, "klibc memset"},
+	{neatlibcMemset, "neatlibc memset"},
+	{dietlibcMemset, "dietlibc memset"},
 	{uClibcMemset, "uClibc memset"},
 	{newlibMemset, "newlib memset"},
 	{muslMemset, "musl memset"},

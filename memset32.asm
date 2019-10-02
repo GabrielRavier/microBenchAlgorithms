@@ -1,7 +1,8 @@
 global pdclibMemset
-global cloudLibcMemset
+global cloudlibcMemset
 global klibcMemset
-global dietLibcMemset
+global neatlibcMemset
+global dietlibcMemset
 global uClibcMemset
 global newlibMemset
 global muslMemset
@@ -57,7 +58,7 @@ pdclibMemset:
 
 
 	align 16
-cloudLibcMemset:
+cloudlibcMemset:
 	push edi
 	push esi
 	push ebx
@@ -169,7 +170,24 @@ klibcMemset:
 
 
 	align 16
-dietLibcMemset:
+neatlibcMemset:
+	push edi
+	mov edi, [esp + 4 + DESTINATION]
+	mov eax, [esp + 4 + FILL]
+	mov ecx, [esp + 4 + LENGTH]
+	mov edx, edi
+	cld
+	rep stosb
+	pop edi
+	mov eax, edx
+	ret
+
+
+
+
+
+	align 16
+dietlibcMemset:
 	push edi
 	mov edi, [esp + 4 + DESTINATION]
 	mov eax, [esp + 4 + FILL]
