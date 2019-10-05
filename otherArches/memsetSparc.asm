@@ -3,5 +3,6 @@ ENTRY dietlibcMemset
 	bge,a dietlibcMemset
 
 	stb %o1, [%o0 + %o2]
+	retl
 	nop
 END dietlibcMemset
