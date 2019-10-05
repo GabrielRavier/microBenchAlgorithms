@@ -30,9 +30,9 @@ section .text align=16
 pdclibMemset:
 	push esi
 	push ebx
-	mov ebx, [esp + 12]
-	mov esi, [esp + 20]
-	movzx ecx, byte [esp + 16]
+	mov ebx, [esp + 8 + DESTINATION]
+	mov esi, [esp + 8 + LENGTH]
+	movzx ecx, byte [esp + 8 + FILL]
 	lea edx, [ebx + esi]
 
 	test esi, esi
@@ -254,41 +254,13 @@ newlibMemset:
 	test edi, 7
 	je .aligned
 
+%rep 6
 	mov [edi], al
 	inc edi
 	dec ecx
 	test edi, 7
 	je .aligned
-
-	mov [edi], al
-	inc edi
-	dec ecx
-	test edi, 7
-	je .aligned
-
-	mov [edi], al
-	inc edi
-	dec ecx
-	test edi, 7
-	je .aligned
-
-	mov [edi], al
-	inc edi
-	dec ecx
-	test edi, 7
-	je .aligned
-
-	mov [edi], al
-	inc edi
-	dec ecx
-	test edi, 7
-	je .aligned
-
-	mov [edi], al
-	inc edi
-	dec ecx
-	test edi, 7
-	je .aligned
+%endrep
 
 	mov [edi], al
 	inc edi
@@ -308,7 +280,7 @@ newlibMemset:
 
 .finish:
 	rep stosb
-	mov eax, [ebp + 8]
+	mov eax, [ebp + 4 + DESTINATION]
 	lea esp, [ebp - 4]
 	pop edi
 	leave
@@ -342,8 +314,8 @@ muslMemset:
 	jbe .return
 
 	shl edx, 16
-	mov dl, [esp + 8]
-	mov dh, [esp + 8]
+	mov dl, [esp + FILL]
+	mov dh, [esp + FILL]
 
 	mov [eax + 3], edx
 	mov [eax + ecx - 7], edx
