@@ -18,6 +18,7 @@ riscv glibc (https://github.com/riscv/riscv-glibc)
 bionic (https://github.com/aosp-mirror/platform_bionic)
 glibc (https://github.com/bminor/glibc)
 asmlib
+uboot-exceet (https://git.kontron-electronics.de/linux/uboot-exceet/tree/3c56fb82804d15536f77b245c89156568819ca63)
 ToaruOS (https://github.com/klange/toaruos)
 Wine MSVCRT (https://github.com/wine-mirror/wine/tree/master/dlls/msvcrt)
 ReactOS (https://github.com/reactos/reactos)
