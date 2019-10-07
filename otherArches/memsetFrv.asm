@@ -52,7 +52,7 @@ ENTRY uClibcMemset
 
 	subicc gr5, #0x40, gr0, icc0
 
-.loop:
+.LUloop:
 	cknc icc0, cc7
 
 	.rept 5
@@ -67,7 +67,7 @@ ENTRY uClibcMemset
 	subicc gr5, #0x40, gr0, icc0
 	cstdu.p gr12, @(gr4, gr7), cc7, #1
 	beqlr icc3, #0
-	bnc icc0, #2, .loop
+	bnc icc0, #2, .LUloop
 
 	; Now do 32 byte remnant
 	subicc.p gr5, #0x20, gr0, icc0
