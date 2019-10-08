@@ -1,0 +1,13 @@
+memset:
+	cris:
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/cris/memset.c (9.54 KB)
+	ia64:
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/ia64/memset.S (10.30 KB)
+	mips:
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/mips/memset.S (12.66 KB)
+	avr32:
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/avr32/memset.S (898 B)
+	metag:
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/metag/memset.S (2.35 KB)
+	nds32:
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/nds32/memset.S (2.33 KB)
