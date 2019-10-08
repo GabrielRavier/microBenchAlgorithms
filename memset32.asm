@@ -213,15 +213,19 @@ uClibcMemset:
 	mov edi, edx
 	mov ebx, ecx
 	shr ecx, 2
-	jz .afterStosd
+	jz .afterStosd	; Zero words, go to fill bytes
 
+	; Extend 8-bit fill to 32 bits
 	movzx eax, al
 	imul eax, 0x1010101
+
+	; Fill full words
 	rep stosd
 
+	; Fill 0-3 bytes
 .afterStosd:
 	and ebx, 3
-	jz .afterLoop
+	jz .afterLoop	; count & 3 == 0, go to end
 
 .loop:
 	stosb
