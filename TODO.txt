@@ -11,3 +11,12 @@ memset:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/metag/memset.S (2.35 KB)
 	nds32:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/nds32/memset.S (2.33 KB)
+	sh:
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/sh/sh4/memset.S (2.57 KB)
+	generic:
+		donex86x64:
+			https://raw.githubusercontent.com/blanham/PDCLib/master/functions/string/memset.c (764 B)
+			https://raw.githubusercontent.com/NuxiNL/cloudlibc/master/src/libc/string/memset.c (775 B)
+		notDone:
+			https://gitlab.com/sortix/sortix/raw/master/libc/string/memset.c (2.21 KB)
+			https://raw.githubusercontent.com/dryc/libc11/master/src/string/memset.c (481 B)
