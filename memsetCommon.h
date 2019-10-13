@@ -90,31 +90,29 @@ inline void doBenchAligns(size_t size, size_t times, memsetFunc memsetPtr, std::
 	doOneBench(false, size, times, memsetPtr, out, resultUnaligned);
 }
 
+inline void printBenchResultsVector(const std::vector<benchResult>& currentResults, std::ostream& out)
+{
+	size_t currentPlacement = 1;
+	for (auto result : currentResults)
+	{
+		out << currentPlacement << "th : " << result.funcName << " in " << static_cast<double>(result.time) / 1000.0 << "ms, "
+		    << static_cast<double>(result.sizePerSecond) * 1000000.0 << "KB/s" << '\n';
+		++currentPlacement;
+	}
+
+	out << '\n';
+}
+
 inline void dumpBatchResult(const benchBatchInfo& result, std::ostream& out)
 {
 	auto [resultsAligned, resultsUnaligned, size, times, sizePerSecond] = result;
 	out << "Leaderboards for size " << size << " (" << times << " times) : \n";
 
-	size_t currentPlacement = 1;
-	for (auto result : resultsAligned)
-	{
-		out << currentPlacement << "th : " << result.funcName << " in " << static_cast<double>(result.time) / 1000.0 << "ms" << '\n';
-		++currentPlacement;
-	}
-
-	out << '\n';
+	printBenchResultsVector(resultsAligned, out);
 
 	out << "Leaderboards for size " << size - 1 << " (" << times << " times) : \n";
 
-	currentPlacement = 1;
-	for (auto result : resultsUnaligned)
-	{
-		out << currentPlacement << "th : " << result.funcName << " in " << static_cast<double>(result.time) / 1000.0 << "ms, "
-		    << static_cast<double>(result.time) / (1.0 / 1000000.0) << "KB/s" << '\n';
-		++currentPlacement;
-	}
-
-	out << '\n';
+	printBenchResultsVector(resultsUnaligned, out);
 }
 
 constexpr std::pair<size_t, size_t> sizesTimes[] =
