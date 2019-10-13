@@ -168,19 +168,21 @@ dietlibcMemset:
 
 	align 16
 uClibcMemset:
-	cmp rdx, 7
-	mov rcx, rdi
+	cmp rdx, 7  ; Check for small lengths
+	mov rcx, rdi    ; Save ptr as return value
 	jbe .less7
 
+	; Populate 8 bit data to full 64 bit
 	mov r8, 0x101010101010101
 	movzx eax, sil
 	imul r8, rax
 
-	test edi, 7
+    test edi, 7	; Check for alignment
 	jz .checkLarge
 
 	align 16
 .align8:
+	; Align pointer to 8 bytes
 	mov [rcx], sil
 	dec rdx
 	inc rcx
@@ -188,6 +190,7 @@ uClibcMemset:
 	jnz .align8
 
 .checkLarge:
+	; Check for really large regions
 	mov rax, rdx
 	shr rax, 6
 	je .fillFinalBytes
@@ -197,6 +200,7 @@ uClibcMemset:
 
 	align 16
 .fill64:
+	; Fill 64 bytes
 	mov [rcx], r8
 	mov [rcx + 8], r8
 	mov [rcx + 16], r8
@@ -210,12 +214,14 @@ uClibcMemset:
 	jne .fill64
 
 .fillFinalBytes:
+	; Fill final bytes
 	and edx, 0x3F
 	mov rax, rdx
 	shr rax, 3
 	je .after8ByteChunks
 
 .byte8Chunks:
+	; First in chunks of 8 bytes
 	mov [rcx], r8
 	add rcx, 8
 	dec rax
@@ -229,17 +235,21 @@ uClibcMemset:
 	je .return
 
 .byteLoop:
+	; And finally as bytes (up to 7)
 	mov [rcx], sil
 	inc rcx
 	dec rdx
 	jne .byteLoop
 
 .return:
-	mov rax, rdi
+	; Load result
+	mov rax, rdi	; Start address of destination is result
 	ret
 
 	align 16
 .largeLoop:
+	; Fill 64 bytes without polluting the cache
+	; We could use movntq [rcx], xmm0 here to further speed up for large cases but let's not use XMM registers
 	movnti [rcx], r8
 	movnti [rcx + 8], r8
 	movnti [rcx + 16], r8
