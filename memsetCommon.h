@@ -18,7 +18,8 @@ using memsetFunc = std::pair<std::function<void *(void *, int, size_t)>, const c
 struct benchResult
 {
 	const char *funcName;
-	uint64_t time;
+	size_t time;
+	size_t sizePerSecond;
 
 	friend bool operator<(const benchResult& left, const benchResult& right)
 	{
@@ -32,6 +33,7 @@ struct benchBatchInfo
 	std::vector<benchResult> resultsUnaligned;
 	size_t size;
 	size_t times;
+	size_t sizePerSecond;
 };
 
 inline auto gettime()
@@ -65,16 +67,21 @@ inline void doOneBench(bool destinationAlign, size_t size, size_t times, memsetF
 	result.funcName = memsetPtr.second;
 
 	usleep(2000);
-	auto timeElapsed = gettime();
+	auto currentTime = gettime();
 	for (size_t i = 0; i < times; ++i)
 		memsetPtr.first(dest, 0, size);
 
-	timeElapsed = gettime() - timeElapsed;
+	auto timeElapsed = gettime() - currentTime;
+	auto sizePerSecond = size / timeElapsed;
 
-	out << static_cast<double>(timeElapsed) / 1000.0 << "ms" << '\n';
-	out.flush();
+	out << static_cast<double>(timeElapsed) / 1000.0 << "ms, "
+	    << static_cast<double>(sizePerSecond) / (1.0 / 1000000.0) << "KB/s";
 
 	result.time = timeElapsed;
+	result.sizePerSecond = sizePerSecond;
+
+	out << '\n';
+	out.flush();
 }
 
 inline void doBenchAligns(size_t size, size_t times, memsetFunc memsetPtr, std::ostream& out, benchResult& resultAligned, benchResult& resultUnaligned)
@@ -85,7 +92,7 @@ inline void doBenchAligns(size_t size, size_t times, memsetFunc memsetPtr, std::
 
 inline void dumpBatchResult(const benchBatchInfo& result, std::ostream& out)
 {
-	auto [resultsAligned, resultsUnaligned, size, times] = result;
+	auto [resultsAligned, resultsUnaligned, size, times, sizePerSecond] = result;
 	out << "Leaderboards for size " << size << " (" << times << " times) : \n";
 
 	size_t currentPlacement = 1;
@@ -102,7 +109,8 @@ inline void dumpBatchResult(const benchBatchInfo& result, std::ostream& out)
 	currentPlacement = 1;
 	for (auto result : resultsUnaligned)
 	{
-		out << currentPlacement << "th : " << result.funcName << " in " << static_cast<double>(result.time) / 1000.0 << "ms" << '\n';
+		out << currentPlacement << "th : " << result.funcName << " in " << static_cast<double>(result.time) / 1000.0 << "ms, "
+		    << static_cast<double>(result.time) / (1.0 / 1000000.0) << "KB/s" << '\n';
 		++currentPlacement;
 	}
 
@@ -111,18 +119,18 @@ inline void dumpBatchResult(const benchBatchInfo& result, std::ostream& out)
 
 constexpr std::pair<size_t, size_t> sizesTimes[] =
 {
-	{2, 1500000},
-	{4, 1500000},
-	{8, 1500000},
-	{16, 1500000},
-	{32, 1000000},
-	{64, 500000},
-	{512, 450000},
-	{1024, 200000},
-	{1024 * 4, 20000},
-	{1024 * 8, 15000},
-	{1024 * 64, 1500},
-	{1024 * 1024, 100},
-	{1024 * 1024 * 4, 25},
-	{1024 * 1024 * 8, 10},
+	{2, 3350000},
+	{4, 2750000},
+	{8, 2700000},
+	{16, 2650000},
+	{32, 2500000},
+	{64, 2350000},
+	{512, 1050000},
+	{1024, 700000},
+	{1024 * 4, 200000},
+	{1024 * 8, 100000},
+	{1024 * 64, 4650},
+	{1024 * 1024, 260},
+	{1024 * 1024 * 4, 60},
+	{1024 * 1024 * 8, 30},
 };
