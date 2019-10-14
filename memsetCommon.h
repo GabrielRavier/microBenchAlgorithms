@@ -1,17 +1,12 @@
 #pragma once
 
-#include <algorithm>
-#include <cstddef>
 #include <cstring>
-#include <ctime>
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <sstream>
-#include <string>
 #include <sys/time.h>
 #include <unistd.h>
-#include <vector>
+#include <utility>
 
 using memsetFunc = std::pair<std::function<void *(void *, int, size_t)>, const char *>;
 
@@ -19,7 +14,7 @@ struct benchResult
 {
 	const char *funcName;
 	size_t time;
-	size_t sizePerSecond;
+	double sizePerSecond;
 
 	friend bool operator<(const benchResult& left, const benchResult& right)
 	{
@@ -33,7 +28,6 @@ struct benchBatchInfo
 	std::vector<benchResult> resultsUnaligned;
 	size_t size;
 	size_t times;
-	size_t sizePerSecond;
 };
 
 inline auto gettime()
@@ -51,7 +45,51 @@ inline const char *alignedStr(bool aligned)
 
 template <typename T> inline T *alignByPowOf2(T *ptr, uintptr_t align)
 {
-	return (T *)(((uintptr_t)ptr + (align - 1)) & -(align));
+	return reinterpret_cast<T *>((reinterpret_cast<uintptr_t>(ptr) + (align - 1)) & -(align));
+}
+
+inline std::string assembleBytesPerSecondStr(double sizePerSecond, const char *bytesUnit, const char *timeUnit = "s")
+{
+	return std::to_string(sizePerSecond) + ' ' + bytesUnit + '/' + timeUnit;
+}
+
+inline std::string bytesPerSecondStr(double sizePerSecond)
+{
+	if (sizePerSecond < (!.0 / 3600.0))
+		return assembleBytesPerSecondStr(sizePerSecond * 3600.0 * 24.0, "B", "d");
+	else if (sizePerSecond < (1.0 / 60.0))
+		return assembleBytesPerSecondStr(sizePerSecond * 3600.0, "B", "h");
+	else if (sizePerSecond < 1.0)
+		return assembleBytesPerSecondStr(sizePerSecond * 60.0, "B", "m");
+	else if (sizePerSecond < 1000.0)
+		return assembleBytesPerSecondStr(sizePerSecond, "B");
+	else if (sizePerSecond < 1000000.0)
+		return assembleBytesPerSecondStr(sizePerSecond / 1000.0, "KB");
+	else if (sizePerSecond < 1000000000.0)
+		return assembleBytesPerSecondStr(sizePerSecond / 1000000.0, "MB");
+	else if (sizePerSecond < 1000000000000.0)
+		return assembleBytesPerSecondStr(sizePerSecond / 1000000000.0, "GB");
+	else
+		return assembleBytesPerSecondStr(sizePerSecond / 1000000000000.0, "TB");
+}
+
+inline std::string assembleTimeStr(double time, const char *unit)
+{
+	return std::to_string(time) + ' ' + unit;
+}
+
+inline std::string timeStr(double time)
+{
+	if (time < 1000.0)
+		return assembleTimeStr(time, "ns");
+	else if (time < 1000000.0)
+		return assembleTimeStr(time, "ms");
+	else if (time < 1000000.0 * 60.0)
+		return assembleTimeStr(time, "s");
+	else if (time < 1000000.0 * 3600.0)
+		return assembleTimeStr(time, "m");
+	else
+		return assembleTimeStr(time, "h");
 }
 
 inline void doOneBench(bool destinationAlign, size_t size, size_t times, memsetFunc memsetPtr, std::ostream& out, benchResult& result)
@@ -72,10 +110,10 @@ inline void doOneBench(bool destinationAlign, size_t size, size_t times, memsetF
 		memsetPtr.first(dest, 0, size);
 
 	auto timeElapsed = gettime() - currentTime;
-	auto sizePerSecond = size / timeElapsed;
+	auto sizePerSecond = static_cast<double>(size) / (static_cast<double>(timeElapsed) / 1000000.0);
 
-	out << static_cast<double>(timeElapsed) / 1000.0 << "ms, "
-	    << static_cast<double>(sizePerSecond) / (1.0 / 1000000.0) << "KB/s";
+	out << timeStr(timeElapsed) << ", "
+	    << bytesPerSecondStr(sizePerSecond);
 
 	result.time = timeElapsed;
 	result.sizePerSecond = sizePerSecond;
@@ -95,8 +133,8 @@ inline void printBenchResultsVector(const std::vector<benchResult>& currentResul
 	size_t currentPlacement = 1;
 	for (auto result : currentResults)
 	{
-		out << currentPlacement << "th : " << result.funcName << " in " << static_cast<double>(result.time) / 1000.0 << "ms, "
-		    << static_cast<double>(result.sizePerSecond) * 1000000.0 << "KB/s" << '\n';
+		out << currentPlacement << "th : " << result.funcName << " in " << timeStr(result.time) << ", "
+		    << bytesPerSecondStr(result.sizePerSecond) << '\n';
 		++currentPlacement;
 	}
 
@@ -105,7 +143,7 @@ inline void printBenchResultsVector(const std::vector<benchResult>& currentResul
 
 inline void dumpBatchResult(const benchBatchInfo& result, std::ostream& out)
 {
-	auto [resultsAligned, resultsUnaligned, size, times, sizePerSecond] = result;
+	auto [resultsAligned, resultsUnaligned, size, times] = result;
 	out << "Leaderboards for size " << size << " (" << times << " times) : \n";
 
 	printBenchResultsVector(resultsAligned, out);
