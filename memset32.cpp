@@ -37,7 +37,7 @@ const static memsetFunc funcs[] =
 	{dietlibcMemset, "dietlibc memset"},
 	{uClibcMemset, "uClibc memset"},
 	{newlibMemset, "newlib memset"},
-    {newlibSmallMemset, "newlib memset optimized for size"},
+	{newlibSmallMemset, "newlib memset optimized for size"},
 	{muslMemset, "musl memset"},
 	{bionicSSE2AtomMemset, "bionic SSE2 Atom memset"},
 	{glibcMemset, "glibc memset"},
