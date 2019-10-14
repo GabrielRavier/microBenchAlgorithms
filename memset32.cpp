@@ -10,6 +10,7 @@ extern "C"
 	mkMemsetDecl(dietlibcMemset)
 	mkMemsetDecl(uClibcMemset)
 	mkMemsetDecl(newlibMemset)
+	mkMemsetDecl(newlibSmallMemset)
 	mkMemsetDecl(muslMemset)
 	mkMemsetDecl(bionicSSE2AtomMemset)
 	mkMemsetDecl(glibcMemset)
@@ -36,6 +37,7 @@ const static memsetFunc funcs[] =
 	{dietlibcMemset, "dietlibc memset"},
 	{uClibcMemset, "uClibc memset"},
 	{newlibMemset, "newlib memset"},
+    {newlibSmallMemset, "newlib memset optimized for size"},
 	{muslMemset, "musl memset"},
 	{bionicSSE2AtomMemset, "bionic SSE2 Atom memset"},
 	{glibcMemset, "glibc memset"},

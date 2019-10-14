@@ -5,6 +5,7 @@ global neatlibcMemset
 global dietlibcMemset
 global uClibcMemset
 global newlibMemset
+global newlibSmallMemset
 global muslMemset
 global bionicSSE2AtomMemset
 global glibcMemset
@@ -242,8 +243,10 @@ uClibcMemset:
 
 
 
+; Takes name and whether we're optimizing for size
+%macro mkNewlibMemset 2
 	align 16
-newlibMemset:
+%1:
 	push ebp
 	mov ebp, esp
 	push edi
@@ -252,12 +255,15 @@ newlibMemset:
 	mov ecx, [ebp + 4 + LENGTH]
 	cld
 
+%if (%2 == 0)
+	; Less than 16 bytes won't benefit from the rep stosd loop
 	cmp ecx, 16
 	jbe .finish
 
 	test edi, 7
 	je .aligned
 
+	; It turns out that 8-byte aligned rep stosd outperforms 4-byte aligned on some x86 platforms
 %rep 6
 	mov [edi], al
 	inc edi
@@ -271,6 +277,7 @@ newlibMemset:
 	dec ecx
 
 .aligned:
+	; At this point, ecx > 8 and edi % 8 == 0
 	mov ah, al
 	mov edx, eax
 	sal edx, 16
@@ -282,6 +289,8 @@ newlibMemset:
 	rep stosd
 	mov ecx, edx
 
+%endif
+
 .finish:
 	rep stosb
 	mov eax, [ebp + 4 + DESTINATION]
@@ -289,6 +298,10 @@ newlibMemset:
 	pop edi
 	leave
 	ret
+%endmacro
+
+	mkNewlibMemset newlibMemset, 0
+	mkNewlibMemset newlibSmallMemset, 1
 
 
 
