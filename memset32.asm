@@ -839,19 +839,19 @@ bionicSSE2AtomMemset:
 	movdqa [edx - 96], xmm0
 
 .alignedSixteenBytes80:
-	movdqa [edx - 96], xmm0
+	movdqa [edx - 80], xmm0
 
 .alignedSixteenBytes64:
-	movdqa [edx - 96], xmm0
+	movdqa [edx - 64], xmm0
 
 .alignedSixteenBytes48:
-	movdqa [edx - 96], xmm0
+	movdqa [edx - 48], xmm0
 
 .alignedSixteenBytes32:
-	movdqa [edx - 96], xmm0
+	movdqa [edx - 32], xmm0
 
 .alignedSixteenBytes16:
-	movdqa [edx - 96], xmm0
+	movdqa [edx - 16], xmm0
 
 .alignedSixteenBytes0:
 	bionicSSE2AtomMemsetReturn
