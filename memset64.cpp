@@ -2,7 +2,6 @@
 
 extern "C"
 {
-#define mkMemsetDecl(x) void *x(void *, int, size_t);
 	mkMemsetDecl(pdclibMemset)
 	mkMemsetDecl(cloudlibcMemset)
 	mkMemsetDecl(klibcMemset)
@@ -36,27 +35,6 @@ const static memsetFunc funcs[] =
 
 int main()
 {
-	std::vector<benchBatchInfo> results;
-	for (auto sizeTime : sizesTimes)
-	{
-		std::vector<benchResult> resultsCurrentSizeAligned;
-		std::vector<benchResult> resultsCurrentSizeUnaligned;
-		for (auto func : funcs)
-		{
-			benchResult resultAligned, resultUnaligned;
-			doBenchAligns(sizeTime.first, sizeTime.second, func, std::cout, resultAligned, resultUnaligned);
-
-			resultsCurrentSizeAligned.push_back(resultAligned);
-			resultsCurrentSizeUnaligned.push_back(resultUnaligned);
-		}
-		std::sort(resultsCurrentSizeAligned.begin(), resultsCurrentSizeAligned.end());
-		std::sort(resultsCurrentSizeUnaligned.begin(), resultsCurrentSizeUnaligned.end());
-		results.push_back({std::move(resultsCurrentSizeAligned), std::move(resultsCurrentSizeUnaligned), sizeTime.first, sizeTime.second});
-		std::cout << '\n';
-	}
-
-	std::cout << "\n\n";
-
-	for (auto benchBatchResult : results)
-		dumpBatchResult(benchBatchResult, std::cout);
+	benchFunctions(funcs, std::cout);
+	return EXIT_SUCCESS;
 }

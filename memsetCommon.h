@@ -9,6 +9,7 @@
 #include <utility>
 
 using memsetFunc = std::pair<std::function<void *(void *, int, size_t)>, const char *>;
+#define mkMemsetDecl(x) void *x(void *, int, size_t);
 
 struct benchResult
 {
@@ -170,3 +171,29 @@ constexpr std::pair<size_t, size_t> sizesTimes[] =
 	{1024 * 1024 * 4, 60},
 	{1024 * 1024 * 8, 30},
 };
+
+template <typename T> void benchFunctions(T funcs, std::ostream& out)
+{
+	std::vector<benchBatchInfo> results;
+	for (auto sizeTime : sizesTimes)
+	{
+		std::vector<benchResult> resultsCurrentSizeAligned;
+		std::vector<benchResult> resultsCurrentSizeUnaligned;
+		for (auto func : funcs)
+		{
+			benchResult resultAligned, resultUnaligned;
+			doBenchAligns(sizeTime.first, sizeTime.second, func, out, resultAligned, resultUnaligned);
+			resultsCurrentSizeAligned.push_back(resultAligned);
+			resultsCurrentSizeUnaligned.push_back(resultUnaligned);
+		}
+		std::sort(resultsCurrentSizeAligned.begin(), resultsCurrentSizeAligned.end());
+		std::sort(resultsCurrentSizeUnaligned.begin(), resultsCurrentSizeUnaligned.end());
+		results.push_back({std::move(resultsCurrentSizeAligned), std::move(resultsCurrentSizeUnaligned), sizeTime.first, sizeTime.second});
+		out << '\n';
+	}
+
+	out << "\n\n";
+
+	for (auto benchBatchResult : results)
+		dumpBatchResult(benchBatchResult, out);
+}
