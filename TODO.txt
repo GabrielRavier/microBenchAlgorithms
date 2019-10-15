@@ -2,6 +2,7 @@ memset:
 	aarch64:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/aarch64/memset.S (4.09 KB)
 	arc:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arc/memset-bs.S (4.45 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arc/memset.S (3.34 KB)
 	avr32:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/avr32/memset.S (898 B)
@@ -10,18 +11,28 @@ memset:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/cris/memset.c (9.54 KB)
 	ft32:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/ft32/memset.S (1.02 KB)
+	h8300:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/h8300/memset.S (1.6 KB)
 	hppa:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/hppa/memset.S (2.03 KB)
+	i960:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/i960/memset.S (3.88 KB)
 	ia64:
-		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/ia64/memset.S (10.30 KB)
-	mips:
-		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/mips/memset.S (12.66 KB)
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/ia64/memset.S (10.3 KB)
+	m68k:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/m68k/memset.S (2.44 KB)
 	metag:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/metag/memset.S (2.35 KB)
+	mips:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/mips/memset.S (13.33 KB)
+		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/mips/memset.S (12.66 KB)
 	nds32:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/nds32/memset.S (2.96 KB)
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/nds32/memset.S (2.33 KB)
 	powerpc:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/powerpc/memset.c (1.73 KB)
+	riscv:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/riscv/memset.S (1.93 KB)
 	rx:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/rx/memset.S (156 B)
 	sh:
@@ -31,8 +42,11 @@ memset:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/sparc/sparc32/memset.S (3.44 KB)
 	spu:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/spu/memset.c (2.87 KB)
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/spu/memset_ea.c (2.13 KB)
 	xtensa:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/xtensa/memset.S (3.51 KB)
+	visium:
+		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/visium/memset.c (13.99 KB)
 	z8k:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/z8k/memset.S (1.86 KB)
 	generic:
@@ -47,7 +61,10 @@ memset:
 
 memcpy:
 memcmp:
+strcpy:
 strlen:
 strcmp:
+strchr:
+setjmp/longjmp:
 
 bitTwiddlingAlgos:
