@@ -26,31 +26,33 @@ extern "C"
 	mkMemsetDecl(inlineStringOpGccNoconaMemset)
 }
 
-const static memsetFunc funcs[] =
+const static std::array<memsetFunc, 23> funcs =
 {
-	{memset, "system libc memset"},
-	{pdclibMemset, "pdclib memset"},
-	{cloudlibcMemset, "cloudlibc memset"},
-	{klibcMemset, "klibc memset"},
-	{neatlibcMemset, "neatlibc memset"},
-	{dietlibcMemset, "dietlibc memset"},
-	{uClibcMemset, "uClibc memset"},
-	{newlibMemset, "newlib memset"},
-	{newlibSmallMemset, "newlib memset optimized for size"},
-	{muslMemset, "musl memset"},
-	{bionicSSE2AtomMemset, "bionic SSE2 Atom memset"},
-	{glibcMemset, "glibc memset"},
-	{glibcI586Memset, "glibc i586 memset"},
-	{glibcI686Memset, "glibc i686 memset"},
-	{asmlibMemset, "asmlib memset"},
-	{bytewiseMemset, "bytewise memset"},
-	{minixMemset, "minix memset"},
-	{freeBsdMemset, "FreeBSD memset"},
-	{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
-	{inlineStringOpGccI386Memset, "-minline-all-stringops -march=i386 gcc memset"},
-	{inlineStringOpGccI486Memset, "-minline-all-stringops -march=i486 gcc memset"},
-	{inlineStringOpGccI686Memset, "-minline-all-stringops -march=i686 gcc memset"},
-	{inlineStringOpGccNoconaMemset, "-minline-all-stringops -march=nocona gcc memset"},
+    {
+		{memset, "system libc memset"},
+		{pdclibMemset, "pdclib memset"},
+		{cloudlibcMemset, "cloudlibc memset"},
+		{klibcMemset, "klibc memset"},
+		{neatlibcMemset, "neatlibc memset"},
+		{dietlibcMemset, "dietlibc memset"},
+		{uClibcMemset, "uClibc memset"},
+		{newlibMemset, "newlib memset"},
+		{newlibSmallMemset, "newlib memset optimized for size"},
+		{muslMemset, "musl memset"},
+		{bionicSSE2AtomMemset, "bionic SSE2 Atom memset"},
+		{glibcMemset, "glibc memset"},
+		{glibcI586Memset, "glibc i586 memset"},
+		{glibcI686Memset, "glibc i686 memset"},
+		{asmlibMemset, "asmlib memset"},
+		{bytewiseMemset, "bytewise memset"},
+		{minixMemset, "minix memset"},
+		{freeBsdMemset, "FreeBSD memset"},
+		{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
+		{inlineStringOpGccI386Memset, "-minline-all-stringops -march=i386 gcc memset"},
+		{inlineStringOpGccI486Memset, "-minline-all-stringops -march=i486 gcc memset"},
+		{inlineStringOpGccI686Memset, "-minline-all-stringops -march=i686 gcc memset"},
+		{inlineStringOpGccNoconaMemset, "-minline-all-stringops -march=nocona gcc memset"}
+    }
 };
 
 int main()
