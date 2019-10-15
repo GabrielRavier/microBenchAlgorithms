@@ -269,13 +269,13 @@ uClibcMemset:
 
 	align 16
 newlibMemset:
-	mov r9, rdi
+	mov r9, rdi	; Save return value
 	mov rax, rsi
 	mov rcx, rdx
 	cmp rdx, 16
 	jb .byteSet
 
-	mov r8, rdi
+	mov r8, rdi	; Align on qword boundary
 	and r8, 7
 	jz .quadwordAligned
 
@@ -292,7 +292,7 @@ newlibMemset:
 	cmp rdx, 256
 	jb .quadwordSet
 
-	shr rcx, 7
+	shr rcx, 7	; Store 128 bytes at a time with minimum cache pollution
 
 	align 16
 .loop:
@@ -321,6 +321,7 @@ newlibMemset:
 	mov rcx, rdx
 	and rcx, 127
 	rep stosb
+
 	mov rax, r9
 	ret
 
@@ -334,9 +335,11 @@ newlibMemset:
 .quadwordSet:
 	shr rcx, 3
 	rep stosq
+
 	mov rcx, rdx
 	and rcx, 7
-	rep stosb
+	rep stosb	; Store the remaining bytes
+
 	mov rax, r9
 	ret
 
