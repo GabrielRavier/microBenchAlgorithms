@@ -1,6 +1,7 @@
 pdclib (https://github.com/blanham/PDCLib)
 cloudlibc (https://github.com/NuxiNL/cloudlibc)
 sortix (https://gitlab.com/sortix/sortix/tree/master/libc)
+wikibooks (https://en.wikibooks.org)
 libc11 (libc11.org)
 SDL (https://github.com/bminor/SDL)
 libft-asm (https://github.com/Globidev/libft-asm)
