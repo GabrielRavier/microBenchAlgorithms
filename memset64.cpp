@@ -4,6 +4,7 @@ extern "C"
 {
 	mkMemsetDecl(pdclibMemset)
 	mkMemsetDecl(cloudlibcMemset)
+	mkMemsetDecl(libFtMemset)
 	mkMemsetDecl(klibcMemset)
 	mkMemsetDecl(neatlibcMemset)
 	mkMemsetDecl(dietlibcMemset)
@@ -17,12 +18,13 @@ extern "C"
 	mkMemsetDecl(inlineStringOpGccSkylakeMemset)
 }
 
-const static std::array<memsetFunc, 12> funcs =
+const static std::array<memsetFunc, 13> funcs =
 {
 	{
 		{memset, "system libc memset"},
 		{pdclibMemset, "pdclib memset"},
 		{cloudlibcMemset, "cloudlibc memset"},
+		{libFtMemset, "libft memset"},
 		{klibcMemset, "klibc memset"},
 		{neatlibcMemset, "neatlibc memset"},
 		{dietlibcMemset, "dietlibc memset"},
@@ -32,7 +34,7 @@ const static std::array<memsetFunc, 12> funcs =
 		{bionicSSE2SlmMemset, "bionic SSE2 memset"},
 		{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
 		{inlineStringOpGccSkylakeMemset, "-minline-all-stringops -march=skylake gcc memset"}
-	}
+    }
 };
 
 int main()

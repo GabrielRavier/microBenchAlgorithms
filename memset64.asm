@@ -1,5 +1,6 @@
 global pdclibMemset
 global cloudlibcMemset
+global libFtMemset
 global klibcMemset
 global neatlibcMemset
 global dietlibcMemset
@@ -104,6 +105,25 @@ cloudlibcMemset:
 	mov r8, rdi
 	mov r9, rdx
 	jmp .afterAlignLoop
+
+
+
+
+
+	align 16
+libFtMemset:
+	cmp rdx, 0
+	je .end
+
+	mov r8, rdi	; Saving dest to be restored later
+	mov rax, rsi
+	mov rcx, rdx	; Setting len iterations
+	cld	; ++rdi at each iteration
+	rep stosb	; *rdi = c
+
+.end:
+	mov rax, r8
+	ret
 
 
 
