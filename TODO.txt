@@ -1,17 +1,31 @@
 memset:
 	aarch64:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/aarch64/multiarch/memset_emag.S (1.23 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/aarch64/multiarch/memset_falkor.S (1.7 KB)
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/aarch64/memset.S (4.09 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/aarch64/memset.S (4.15 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/aarch64/multiarch/memset_base64.S (4.25 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/aarch64/memset.S (6.61 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm64/generic/bionic/memset.S (7.05 KB)
+	alpha:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/alpha/memset.S (3.63 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/alpha/alphaev6/memset.S (6.03 KB)
 	arc:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arc/memset.S (3.34 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arc/memset-archs.S (3.77 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arc/memset-bs.S (4.45 KB)
 	arm:
 		https://git.musl-libc.org/cgit/musl/plain/src/string/arm/__aeabi_memset.s (578 B)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/arm/memset.S (1.71 KB)
 		https://raw.githubusercontent.com/Olde-Skuul/doom3do/master/lib/string/memset.s (2.24 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-arm.S (2.52 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-thumb2.S (2.53 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-thumb.S (2.68 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/krait/bionic/memset.S (2.85 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/generic/bionic/memset.S (3.65 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/cortex-a7/bionic/memset.S (4.94 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/cortex-a9/bionic/memset.S (5.02 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/cortex-a15/bionic/memset.S (5.26 KB)
 	avr:
 		https://raw.githubusercontent.com/vancegroup-mirrors/avr-libc/master/avr-libc/libc/string/memset.S (2.67 KB)
 	avr32:
@@ -19,6 +33,8 @@ memset:
 	cris:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/cris/memset.c (7.28 KB)
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/cris/memset.c (9.54 KB)
+	csky:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/csky/abiv2/memset.S (2.33 KB)
 	ft32:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/ft32/memset.S (1.02 KB)
 	h8300:
@@ -29,6 +45,7 @@ memset:
 	i960:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/i960/memset.S (3.88 KB)
 	ia64:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/ia64/memset.S (10.05 KB)
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/ia64/memset.S (10.3 KB)
 	m6502:
 		https://raw.githubusercontent.com/itszor/gcc-6502-bits/master/libtinyc/memset.S (467 B)
@@ -42,8 +59,11 @@ memset:
 	metag:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/metag/memset.S (2.35 KB)
 	mips:
+		https://raw.githubusercontent.com/olibc/olibc/master/libc/arch-mips/string/memset.S (8.12 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/mips/memset.S (12.57 KB)
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/mips/memset.S (12.66 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/mips/memset.S (13.33 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-mips/string/memset.S (13.72 KB)
 	mn10300:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/mn10300/memset.S (1.78 KB)
 	nds32:
@@ -51,15 +71,35 @@ memset:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/nds32/memset.S (2.33 KB)
 	powerpc:
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/powerpc/memset.c (1.73 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc32/476/memset.S (3.94 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc32/405/memset.S (3.95 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc32/power4/memset.S (5.77 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc32/power7/memset.S (6.84 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc32/memset.S (8.57 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc32/power6/memset.S (13.49 KB)
+	powerpc64:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc64/power7/memset.S (6.26 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc64/power4/memset.S (6.28 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc64/memset.S (6.54 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc64/power8/memset.S (8.64 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/powerpc/powerpc64/power6/memset.S (9.38 KB)
 	riscv:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/riscv/memset.S (1.93 KB)
+		https://raw.githubusercontent.com/riscv/riscv-glibc/riscv-glibc-2.26/sysdeps/riscv/memset.S (2.08 KB)
 	rx:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/rx/memset.S (156 B)
+	s390:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/s390/memset-z900.S (5.02 KB)
 	sh:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/sh/memset.S (1.71 KB)
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/sh/sh4/memset.S (2.57 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/sh/memset.S (3.12 KB)
-	sparc:
+	sparc32:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/sparc/sparc32/memset.S (3.4 KB)
 		https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/sparc/sparc32/memset.S (3.44 KB)
+	sparc64:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/sparc/sparc64/multiarch/memset-niagara4.S (3.05 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/sparc/sparc64/multiarch/memset-niagara7.S (9.19 KB)
 	spu:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/spu/memset_ea.c (2.13 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/spu/memset.c (2.87 KB)
@@ -67,6 +107,19 @@ memset:
 		https://github.com/lkundrak/dev86/blob/master/libc/string/string.c (1.1 KB)
 		https://raw.githubusercontent.com/SpookyVerkauferin/libc/master/libc/source/string.asm (1.1 KB)
 		https://raw.githubusercontent.com/oded8bit/Assembly-Lib/3c8d8e3fd829a20dd88a086d9933f1595c3ea97c/UtilLib/mem.asm (1.8 K)
+	x86:
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/i386/memset.S (1.68 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-x86/silvermont/string/sse2-memset-slm.S (20.83 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/i386/i686/multiarch/memset-sse2-rep.S (22.60 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-x86/atom/string/sse2-memset-atom.S (23.55 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/i386/i686/multiarch/memset-sse2.S (23.71 KB)
+	x86-64:
+		https://raw.githubusercontent.com/bminor/glibc/43b1048ab9418e902aac8c834a7a9a88c501620a/sysdeps/x86_64/multiarch/memset-avx2-unaligned-erms.S (510 B)
+		https://raw.githubusercontent.com/bminor/glibc/43b1048ab9418e902aac8c834a7a9a88c501620a/sysdeps/x86_64/multiarch/memset-avx512-unaligned-erms.S (583 B)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/x86_64/memset.S (1.73 KB)
+		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-x86_64/string/sse2-memset-slm.S (3.43 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/x86_64/multiarch/memset-avx512-no-vzeroupper.S (4.28 KB)
+		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/x86_64/multiarch/memset-vec-unaligned-erms.S (7.04 KB)
 	xscale:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/xscale/memset.c (1.66 KB)
 	xtensa:
@@ -77,6 +130,7 @@ memset:
 		https://raw.githubusercontent.com/z88dk/z88dk/master/libsrc/_DEVELOPMENT/string/c/sdcc_ix/memset_callee.asm (220 B)
 		https://raw.githubusercontent.com/z88dk/z88dk/master/libsrc/_DEVELOPMENT/string/c/sdcc_ix/memset.asm (236 B)
 		https://raw.githubusercontent.com/z88dk/z88dk/master/libsrc/_DEVELOPMENT/string/c/sccz80/memset_callee.asm (332 B)
+		https://raw.githubusercontent.com/EtchedPixels/FUZIX/master/Applications/SmallC/Z80/lib/_memset.s (338 B)
 		https://raw.githubusercontent.com/z88dk/z88dk/master/libsrc/_DEVELOPMENT/string/c/sccz80/memset.asm (576 B)
 		https://raw.githubusercontent.com/z88dk/z88dk/master/libsrc/_DEVELOPMENT/string/z80/asm_memset.asm (1.26 KB)
 	z8k:
@@ -87,24 +141,149 @@ memset:
 			https://raw.githubusercontent.com/NuxiNL/cloudlibc/master/src/libc/string/memset.c (775 B)
 		notDone:
 			https://raw.githubusercontent.com/KnightOS/libc/master/src/string.c (120 B)
+			https://raw.githubusercontent.com/EtchedPixels/FUZIX/master/Library/libs/memset.c (148 B)
 			https://raw.githubusercontent.com/lkundrak/dev86/master/libc/string/string.c (165 B)
 			https://raw.githubusercontent.com/itszor/gcc-6502-bits/master/libtinyc/memset.c (192 B)
 			https://raw.githubusercontent.com/KnightOS/kcc/master/device/lib/_memset.c (229 B)
 			https://en.wikibooks.org/wiki/C_Programming/String_manipulation#The_memset_function (232 B)
 			https://raw.githubusercontent.com/dryc/libc11/master/src/string/memset.c (481 B)
+			https://raw.githubusercontent.com/maandree/slibc/master/src/string/mem/memset.c (1.18 KB)
 			https://raw.githubusercontent.com/bminor/SDL/master/src/stdlib/SDL_string.c (1.4 KB)
+			https://raw.githubusercontent.com/olibc/olibc/master/libc/bionic/memset.c (1.71 KB)
 			https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/string/memset.c (2.03 KB)
 			https://raw.githubusercontent.com/open-watcom/open-watcom-v2/master/bld/clib/memory/c/memcpy.c (2.03 KB)
 			https://git.musl-libc.org/cgit/musl/plain/src/string/memset.c (2.16 KB)
 			https://raw.githubusercontent.com/wbx-github/uclibc-ng/master/libc/string/generic/memset.c (2.17 KB)
 			https://gitlab.com/sortix/sortix/raw/master/libc/string/memset.c (2.21 KB)
+			https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/string/memset.c (2.24 KB)
 
+https://www.etalabs.net/compare_libcs.html:
+strlen:
+strchr:
+strstr:
+qsort:
+malloc:
+printf:
 memcpy:
 memcmp:
 strcpy:
-strlen:
 strcmp:
-strchr:
 setjmp/longjmp:
-
+abs/labs/llabs:
+acos:
+acosh:
+asin:
+asinh:
+atan:
+atanh:
+memccpy:
+memchr:
+memmem:
+memmove:
+mempcpy:
+memrchr:
+rawmemchr:
+stpcpy:
+stpncpy:
+strcasecmp:
+strcasestr:
+strcat:
+strchrnul:
+strcoll:
+strcspn:
+strncasecmp:
+strncat:
+strncmp:
+strnlen:
+strncpy:
+strrchr:
+strsep:
+strspn:
+strstr:
+strtod:
+strtok:
+wcpcpy:
+wcpncpy:
+wcscat:
+wcschr:
+wcschrnul:
+wcscmp:
+wcscpy:
+wcscspn:
+wcslen:
+wcsncat:
+wcsncmp:
+wcsncpy:
+wcsnlen:
+wcspbrk:
+wcsrchr:
+wcsspn:
+wmemchr:
+wmemcmp:
+wmemset:
+cos:
+cosf:
+cosh:
+exp
+exp2:
+exp2f:
+expf:
+ffs:
+ffsll:
+ffsl:
+fmax:
+fmaxf:
+fmin:
+fminf:
+hypot:
+isfinite:
+isinf:
+isnan:
+log:
+log2:
+log2f:
+logb:
+logbf:
+logf:
+modf:
+pow:
+powf:
+rint:
+sin:
+sinf:
+sincos:
+sincosf:
+sinf:
+sinh:
+sprintf:
+sqrt:
+tan:
+tanh:
+trunc:
+truncf:
+mbstowcs:
+mbrtowc:
+regcomp:
+pthread:
+log10:
+isnormal:
+fpclassify:
+signbit:
+fabs:
+isalnum:
+isalpha:
+isascii:
+isblank:
+iscntrl:
+isgraph:
+islower:
+isprint:
+ispunct:
+isspace:
+isupper:
+isxdigit:
+isascii:
+tolower:
+toupper:
 bitTwiddlingAlgos:
+runtimeStuff:

@@ -4,7 +4,7 @@ all: $(TESTS)
 
 obj32/%.o: %.cpp
 	@mkdir -p obj32
-	g++ -c $^ -o $@ -m32 -Ofast -std=gnu++17
+	g++ -c $^ -o $@ -m32 -Ofast -std=gnu++2a
 
 obj32/%AsmFuncs.o: %.asm
 	@mkdir -p obj64
@@ -12,7 +12,7 @@ obj32/%AsmFuncs.o: %.asm
 
 obj64/%.o: %.cpp
 	@mkdir -p obj64
-	g++ -c $^ -o $@ -m64 -Ofast -std=gnu++17
+	g++ -c $^ -o $@ -m64 -Ofast -std=gnu++2a
 
 obj64/%AsmFuncs.o: %.asm
 	@mkdir -p obj64
