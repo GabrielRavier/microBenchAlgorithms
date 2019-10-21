@@ -15,6 +15,8 @@ global asmlibMemset
 global asmlibSSE2Memset
 global asmlibSSE2v2Memset
 global asmlibAVXMemset
+global asmlibAVX512FMemset
+global asmlibAVX512BWMemset
 global msvc2003Memset
 global minixMemset
 global freeBsdMemset
@@ -30,6 +32,13 @@ section .text align=16
 %define DESTINATION 4
 %define FILL 8
 %define LENGTH 12
+
+%macro mkReturnDestinationFromStackNoPop
+
+	mov eax, [esp + DESTINATION]
+	ret
+
+%endmacro
 
 	align 16
 pdclibMemset:
@@ -374,9 +383,7 @@ muslMemset:
 .finish:
 	shr ecx, 2
 	rep stosd
-	mov eax, [esp + DESTINATION]
-	mov edi, [esp + LENGTH]
-	ret
+	mkReturnDestinationFromStackNoPop
 
 .notF:
 	xor edx, edx
@@ -1090,14 +1097,27 @@ glibcI686Memset:
 
 
 
-	align 16
-asmlibMemset:
+%macro mkAsmlibLoadParamsAndBroadcastFillExtraParam 1
 	mov edx, [esp + DESTINATION]
+%if %1 == 1
 	xor eax, eax
 	mov al, [esp + FILL]
+%else
+	movzx eax, byte [esp + FILL]
+%endif
 	mov ecx, [esp + LENGTH]
-
 	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
+%endmacro
+
+%macro mkAsmlibLoadParamsAndBroadcastFill
+
+	mkAsmlibLoadParamsAndBroadcastFillExtraParam 0
+
+%endmacro
+
+	align 16
+asmlibMemset:
+	mkAsmlibLoadParamsAndBroadcastFillExtraParam 1
 	push edi
 	mov edi, edx
 	cmp ecx, 4
@@ -1126,8 +1146,7 @@ asmlibMemset:
 .less4:
 	rep stosb	; Store any remaining bytes
 	pop edi
-	mov eax, [esp + DESTINATION]
-	ret
+	mkReturnDestinationFromStackNoPop
 
 
 
@@ -1202,10 +1221,7 @@ asmlibMemset:
 
 	align 16
 asmlibSSE2Memset:
-	mov edx, [esp + DESTINATION]
-	movzx eax, byte [esp + FILL]
-	mov ecx, [esp + LENGTH]
-	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
+	mkAsmlibLoadParamsAndBroadcastFill
 
 	cmp ecx, 16
 	ja .above16
@@ -1220,27 +1236,23 @@ asmlibSSE2Memset:
 	mov [edx], eax
 
 .small0:
-	mov eax, [esp + DESTINATION]
-	ret
+	mkReturnDestinationFromStackNoPop
 
 	align 16
 	mkAsmlibSSE2ThreeStores 15, 11, 7, 3
 	mov [edx + 1], eax
 	mov [edx], al
-	mov eax, [esp + DESTINATION]
-	ret
+	mkReturnDestinationFromStackNoPop
 
 	align 16
 	mkAsmlibSSE2ThreeStores 14, 10, 6, 2
 	mov [edx], ax
-	mov eax, [esp + DESTINATION]
-	ret
+	mkReturnDestinationFromStackNoPop
 
 	align 16
 	mkAsmlibSSE2ThreeStores 13, 9, 5, 1
 	mov [edx], al
-	mov eax, [esp + DESTINATION]
-	ret
+	mkReturnDestinationFromStackNoPop
 
 	align 16
 .jumpTable:
@@ -1262,13 +1274,10 @@ asmlibSSE2Memset:
 
 	align 16
 asmlibSSE2v2Memset:
-	mov edx, [esp + DESTINATION]
-	movzx eax, byte [esp + FILL]
-	mov ecx, [esp + LENGTH]
+	mkAsmlibLoadParamsAndBroadcastFill
 
-	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
 	cmp ecx, 16
-	jna asmlibSSE2Memset.less16	; Small counts : Same as AVX version
+	jna asmlibSSE2Memset.less16
 
 	mkAsmlibSSE2StartSSE
 	mkAsmLibSSE2RegularLoop movdqa, Normal, 0
@@ -1300,18 +1309,13 @@ asmlibSSE2v2Memset:
 	; The last part from ecx to eax is < 32 bytes. Write 32 bytes with overlap
 	movups [eax - 0x20], xmm0
 	movups [eax - 0x10], xmm0
-	mov eax, [esp + DESTINATION]
-	ret
+	mkReturnDestinationFromStackNoPop
 
 %endmacro
 
 	align 16
 asmlibAVXMemset:
-	mov edx, [esp + DESTINATION]
-	movzx eax, byte [esp + FILL]
-	mov ecx, [esp + LENGTH]
-
-	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
+	mkAsmlibLoadParamsAndBroadcastFill
 
 .entryAVX512F:
 	cmp ecx, 16
@@ -1377,8 +1381,19 @@ asmlibAVXMemset:
 	; 16 < count <= 32
 	movups [edx], xmm0
 	movups [edx - 0x10], xmm0
-	mov eax, [esp + DESTINATION]
-	ret
+	mkReturnDestinationFromStackNoPop
+
+
+
+
+
+	align 16
+asmlibAVX512FMemset:
+	mov edx, [esp + DESTINATION]
+	movzx eax, byte [esp + FILL]
+	mov ecx, [esp + LENGTH]
+	imul eax, 0x1010101
+
 
 
 
@@ -1446,8 +1461,7 @@ msvc2003Memset:
 
 	align 16
 .toEnd:
-	mov eax, [esp + DESTINATION]	; Return destination pointer
-	ret
+	mkReturnDestinationFromStackNoPop
 
 
 
