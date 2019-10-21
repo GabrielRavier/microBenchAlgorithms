@@ -12,6 +12,10 @@ global glibcMemset
 global glibcI586Memset
 global glibcI686Memset
 global asmlibMemset
+global asmlibSSE2Memset
+global asmlibSSE2v2Memset
+global asmlibAVXMemset
+global msvc2003Memset
 global minixMemset
 global freeBsdMemset
 global inlineStringOpGccMemset
@@ -1093,7 +1097,7 @@ asmlibMemset:
 	mov al, [esp + FILL]
 	mov ecx, [esp + LENGTH]
 
-	imul eax, 0x1010101
+	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
 	push edi
 	mov edi, edx
 	cmp ecx, 4
@@ -1104,7 +1108,7 @@ asmlibMemset:
 	jz .aligned
 
 .unalignedLoop:
-	mov [edi], al
+	mov [edi], al	; Store 1 byte until edi aligned
 	inc edi
 	dec ecx
 	test edi, 3
@@ -1114,15 +1118,335 @@ asmlibMemset:
 	mov edx, ecx
 	shr ecx, 2
 	cld
-	rep stosd
+	rep stosd	; Store 4 bytes at a time
 
 	mov ecx, edx
 	and ecx, 3
 
 .less4:
-	rep stosb
+	rep stosb	; Store any remaining bytes
 	pop edi
 	mov eax, [esp + DESTINATION]
+	ret
+
+
+
+
+
+%macro mkAsmlibSSE2StartSSE 0
+	; count > 16. Use SSE2
+	movd xmm0, eax
+	pshufd xmm0, xmm0, 0	; Broadcast c into all bytes of xmm0
+
+	; Store the first unaligned part
+	; The size of this part is 1 - 16 bytes
+	; It is faster to write 16 bytes, possibly overlapping with the subsequent regular part, than to make possibly mispredicted branches depending on the size of the first part
+	movq [edx], xmm0
+	movq [edx + 8], xmm0
+
+	; Check if count very big
+	cmp ecx, 1024 * 1024 * 4
+	ja .above4Megs	; Use non-temporal store if count > 1M (typical size of cache)
+%endmacro
+
+%macro mkAsmlibSSE2ThreeStores 4
+.small%1:
+	mov [edx + %2], eax
+
+.small%2:
+	mov [edx + %3], eax
+
+.small%3:
+	mov [edx + %4], eax
+
+.small%4:
+%endmacro
+
+%macro mkAsmLibSSE2RegularLoop 3
+	; End of regular part
+	; Round down dest + count to nearest preceding 16-byte boundary
+	lea ecx, [edx + ecx - 1]
+	and ecx, -0x10
+
+	; Start of regular part
+	; Round up dest to next 16-byte boundary
+	add edx, 0x10
+	and edx, -0x10
+
+	; -(size of regular part)
+	sub edx, ecx
+	jnl .lastIrregular%2	; Jump if not negative
+
+.regularPartLoop%2:
+	; Loop through regular part
+	; ecx = end of regular part
+	; edx = negative index from the end, counting up to zero
+	%1 [ecx + edx], xmm0
+	add edx, 0x10
+	jnz .regularPartLoop%2
+
+%if %3 == 1
+	sfence
+%endif
+
+.lastIrregular%2:
+	; Do the last irregular part
+	; The size of that part is 1 - 16 bytes
+	; It is faster to always write 16 bytes, possibly overlapping with the preceding regular part, than to make possibly mispredicted branches depending on the size of the last part
+	mov eax, [esp + DESTINATION]
+	mov ecx, [esp + LENGTH]
+	movq [eax + ecx - 0x10], xmm0
+	movq [eax + ecx - 8], xmm0
+	ret
+%endmacro
+
+	align 16
+asmlibSSE2Memset:
+	mov edx, [esp + DESTINATION]
+	movzx eax, byte [esp + FILL]
+	mov ecx, [esp + LENGTH]
+	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
+
+	cmp ecx, 16
+	ja .above16
+
+.less16:
+	jmp [.jumpTable + ecx * 4]
+
+
+	align 16
+	mkAsmlibSSE2ThreeStores 16, 12, 8, 4
+
+	mov [edx], eax
+
+.small0:
+	mov eax, [esp + DESTINATION]
+	ret
+
+	align 16
+	mkAsmlibSSE2ThreeStores 15, 11, 7, 3
+	mov [edx + 1], eax
+	mov [edx], al
+	mov eax, [esp + DESTINATION]
+	ret
+
+	align 16
+	mkAsmlibSSE2ThreeStores 14, 10, 6, 2
+	mov [edx], ax
+	mov eax, [esp + DESTINATION]
+	ret
+
+	align 16
+	mkAsmlibSSE2ThreeStores 13, 9, 5, 1
+	mov [edx], al
+	mov eax, [esp + DESTINATION]
+	ret
+
+	align 16
+.jumpTable:
+	dd .small0, .small1, .small2, .small3, .small4, .small5, .small6, .small7, .small8, .small9, .small10, .small11, .small12, .small13, .small14, .small15, .small16
+
+	align 16
+.above16:
+	mkAsmlibSSE2StartSSE
+	mkAsmLibSSE2RegularLoop movdqa, Normal, 0
+
+	align 16
+.above4Megs:
+	; Use non-temporal stores, same code as above
+	mkAsmLibSSE2RegularLoop movdqu, NonTemporal, 0
+
+
+
+
+
+	align 16
+asmlibSSE2v2Memset:
+	mov edx, [esp + DESTINATION]
+	movzx eax, byte [esp + FILL]
+	mov ecx, [esp + LENGTH]
+
+	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
+	cmp ecx, 16
+	jna asmlibSSE2Memset.less16	; Small counts : Same as AVX version
+
+	mkAsmlibSSE2StartSSE
+	mkAsmLibSSE2RegularLoop movdqa, Normal, 0
+
+.above4Megs:
+	; Use non-temporal stores, same code as above
+	mkAsmLibSSE2RegularLoop movntdq, NonTemporal, 1
+
+
+
+
+
+%macro mkAsmlibAVXPrologAVX 1
+	; Find last 32 bytes boundary
+	mov ecx, eax
+	and ecx, -0x20
+
+	; -size of 32-bytes blocks
+	sub edx, ecx
+	jnb .finish%1	; Jump if not negative
+
+	; Extend value to 256 bits
+	vinsertf128	ymm0, xmm0, 1
+%endmacro
+
+%macro mkAsmlibAVXFinishAVX 1
+
+.finish%1:
+	; The last part from ecx to eax is < 32 bytes. Write 32 bytes with overlap
+	movups [eax - 0x20], xmm0
+	movups [eax - 0x10], xmm0
+	mov eax, [esp + DESTINATION]
+	ret
+
+%endmacro
+
+	align 16
+asmlibAVXMemset:
+	mov edx, [esp + DESTINATION]
+	movzx eax, byte [esp + FILL]
+	mov ecx, [esp + LENGTH]
+
+	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
+
+.entryAVX512F:
+	cmp ecx, 16
+	jna asmlibSSE2Memset.less16
+
+	; Length > 16
+	movd xmm0, eax
+	pshufd xmm0, xmm0, 0	; Broadcast c into all bytes of xmm0
+	lea eax, [edx + ecx]	; Point to end
+
+	cmp ecx, 0x20
+	jbe .less32
+
+	; Store the first unaligned 16 bytes
+	; It is faster to always write 16 bytes, possibly overlapping with the subsequent regular part, than to make possibly mispredicted branches depending on the size of the first part
+	movups [edx], xmm0
+
+	; Store another 16 bytes, aligned
+	add edx, 0x10
+	and edx, -0x10
+	movaps [edx], xmm0
+
+	; Go to next 32 bytes boundary
+	add edx, 0x10
+	and edx, -0x20
+
+	; Check if count very big
+	cmp ecx, 1024 * 1024 * 4
+	ja .above4Megs	; Use non-temporal stores if count > 4M
+
+	mkAsmlibAVXPrologAVX Normal
+
+.loop32:
+	; Loop through 32-byte blocks
+	; ecx = end of 32-byte blocks
+	; edx = negative index from the end, counting up to zero
+	vmovaps [ecx + edx], ymm0
+	add edx, 0x20
+	jnz .loop32
+
+	vzeroupper
+	mkAsmlibAVXFinishAVX Normal
+
+	align 16
+.above4Megs:
+	; Use non-temporal moves, same code as above
+	mkAsmlibAVXPrologAVX NonTemporal
+
+	align 16
+.loop32NonTemporal:
+	; Loop through 32-byte blocks
+	; ecx = end of 32-byte blocks
+	; edx = negative index from the end, counting up to zero
+	vmovntps [ecx + edx], ymm0
+	add edx, 0x20
+	jnz .loop32NonTemporal
+
+	sfence
+	vzeroupper
+	mkAsmlibAVXFinishAVX NonTemporal
+
+.less32:
+	; 16 < count <= 32
+	movups [edx], xmm0
+	movups [edx - 0x10], xmm0
+	mov eax, [esp + DESTINATION]
+	ret
+
+
+
+
+
+	align 16
+msvc2003Memset:
+	mov edx, [esp + LENGTH]	; edx = length
+	mov ecx, [esp + DESTINATION]	; ecx points to destination
+	test edx, edx	; 0 ?
+	jz .toEnd	; If so, nothing to do
+
+	xor eax, eax
+	mov al, [esp + FILL]	; The byte to be stored
+	push edi	; Preserve edi
+	mov edi, ecx	; edi = destination pointer
+	cmp edx, 4	; If it's less than 4 bytes
+	jb .tail	; Tail needs edi and edx to be initialized
+
+	neg ecx
+	and ecx, 3	; ecx = amount of bytes before dword boundary
+	jz .dwords	; jump if address already aligned
+
+	sub edx, ecx	; edx = adjusted count, for later
+
+.adjustLoop:
+	mov [edi], al
+	add edi, 1
+	sub ecx, 1
+	jnz .adjustLoop
+
+.dwords:
+	; Set all 4 bytes of eax to value
+	mov ecx, eax	; ecx = 0/0/0/value
+	shl eax, 8	; eax = 0/0/value/0
+	add eax, ecx	; eax = 0/0/value/value
+	mov ecx, eax	; ecx = 0/0/value/value
+	shl eax, 0x10	; eax = value/value/0/0
+	add eax, ecx	; eax = all 4 bytes = value/value/value/value
+
+	; Set dword sized blocks
+	mov ecx, edx	; Move original count to ecx
+	and edx, 3	; Prepare in edx byte count (for tail loop)
+	shr ecx, 2	; Adjust ecx to be dword count
+	jz .tail	; Jump if it was less than 4 bytes
+
+	rep stosd
+
+.mainLoopTail:
+	test edx, edx	; If there are no tail bytes
+	jz .finish	; We finish, and it's time to leave
+
+.tail:
+	mov [edi], al	; Set remaining bytes
+	add edi, 1
+	sub edx, 1	; If there is some more bytes
+	jnz .tail	; Continue to fill them
+
+	; Done
+
+.finish:
+	mov eax, [esp + 4 + DESTINATION]	; Return destination pointer
+	pop edi	; Restore edi
+	ret
+
+	align 16
+.toEnd:
+	mov eax, [esp + DESTINATION]	; Return destination pointer
 	ret
 
 

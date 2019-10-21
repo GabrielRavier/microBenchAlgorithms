@@ -16,6 +16,10 @@ extern "C"
 	mkMemsetDecl(glibcI586Memset)
 	mkMemsetDecl(glibcI686Memset)
 	mkMemsetDecl(asmlibMemset)
+	mkMemsetDecl(asmlibSSE2Memset)
+	mkMemsetDecl(asmlibSSE2v2Memset)
+	mkMemsetDecl(asmlibAVXMemset)
+	mkMemsetDecl(msvc2003Memset)
 	mkMemsetDecl(bytewiseMemset)
 	mkMemsetDecl(minixMemset)
 	mkMemsetDecl(freeBsdMemset)
@@ -26,7 +30,7 @@ extern "C"
 	mkMemsetDecl(inlineStringOpGccNoconaMemset)
 }
 
-const static std::array<memsetFunc, 23> funcs =
+const static std::array<memsetFunc, 27> funcs =
 {
     {
 		{memset, "system libc memset"},
@@ -44,6 +48,10 @@ const static std::array<memsetFunc, 23> funcs =
 		{glibcI586Memset, "glibc i586 memset"},
 		{glibcI686Memset, "glibc i686 memset"},
 		{asmlibMemset, "asmlib memset"},
+		{asmlibSSE2Memset, "asmlib SSE2 memset"},
+		{asmlibSSE2v2Memset, "asmlib SSE2 memset v2"},
+		{asmlibAVXMemset, "asmlib AVX memset"},
+		{msvc2003Memset, "MSVC 2003 memset"},
 		{bytewiseMemset, "bytewise memset"},
 		{minixMemset, "minix memset"},
 		{freeBsdMemset, "FreeBSD memset"},
