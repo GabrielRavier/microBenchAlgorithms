@@ -383,6 +383,7 @@ muslMemset:
 .finish:
 	shr ecx, 2
 	rep stosd
+	mov edi, [esp + LENGTH]
 	mkReturnDestinationFromStackNoPop
 
 .notF:
@@ -1380,7 +1381,7 @@ asmlibAVXMemset:
 .less32:
 	; 16 < count <= 32
 	movups [edx], xmm0
-	movups [edx - 0x10], xmm0
+	movups [eax - 0x10], xmm0
 	mkReturnDestinationFromStackNoPop
 
 
