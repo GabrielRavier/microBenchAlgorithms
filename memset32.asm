@@ -15,8 +15,8 @@ global asmlibMemset
 global asmlibSSE2Memset
 global asmlibSSE2v2Memset
 global asmlibAVXMemset
-global asmlibAVX512FMemset
-global asmlibAVX512BWMemset
+global asmlibAVX512FMemset	; Untested
+global asmlibAVX512BWMemset	; Untested
 global msvc2003Memset
 global minixMemset
 global freeBsdMemset
@@ -33,7 +33,7 @@ section .text align=16
 %define FILL 8
 %define LENGTH 12
 
-%macro mkReturnDestinationFromStackNoPop
+%macro mkReturnDestinationFromStackNoPop 0
 
 	mov eax, [esp + DESTINATION]
 	ret
@@ -1109,7 +1109,7 @@ glibcI686Memset:
 	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
 %endmacro
 
-%macro mkAsmlibLoadParamsAndBroadcastFill
+%macro mkAsmlibLoadParamsAndBroadcastFill 0
 
 	mkAsmlibLoadParamsAndBroadcastFillExtraParam 0
 
@@ -1387,13 +1387,104 @@ asmlibAVXMemset:
 
 
 
+%macro mkAsmlibAVX512SaveAndBroadcastIntoZmm 0
+
+	push edi
+	mov edi, edx	; Save dest
+	vpbroadcastd zmm0, eax	; Broadcast further into 64 bytes
+
+%endmacro
+
 	align 16
 asmlibAVX512FMemset:
-	mov edx, [esp + DESTINATION]
-	movzx eax, byte [esp + FILL]
-	mov ecx, [esp + LENGTH]
-	imul eax, 0x1010101
+	mkAsmlibLoadParamsAndBroadcastFill
+	cmp ecx, 0x80
+	jbe asmlibAVXMemset.entryAVX512F	; Use AVX code if count <= 0x80
 
+	mkAsmlibAVX512SaveAndBroadcastIntoZmm
+	jmp asmlibAVX512BWMemset.entryAVX512F	; Use AVX512BW code
+
+
+
+
+
+	align 16
+asmlibAVX512BWMemset:
+	mkAsmlibLoadParamsAndBroadcastFill
+	mkAsmlibAVX512SaveAndBroadcastIntoZmm
+
+	cmp ecx, 0x40
+	jbe .less40
+
+	cmp ecx, 0x80
+	jbe .less80	; Use simpler code if count <= 0x80
+
+.entryAVX512F:
+	; Count > 0x80
+	; Store first 0x40 bytes
+	vmovdqu64 [edx], zmm0
+
+	; Find first 0x40 boundary
+	add edx, 0x40
+	and edx, -0x40
+
+	; Find last 0x40 boundary
+	lea eax, [edi + ecx]
+	and eax, -0x40
+	sub edx, eax	; Negative count from last 0x40 boundary
+
+	; Check if count very big
+	cmp ecx, 1024 * 1024 * 4
+	ja .above4Megs	; Use non-temporal store if count > 4M
+
+.avx512MainLoop:
+	vmovdqa64 [eax + edx], zmm0
+	add edx, 0x40
+	jnz .avx512MainLoop
+
+.finish:
+	; Remaining 0-0x3F bytes
+	; Overlap previous bytes
+	vmovdqu64 [edi + ecx - 0x40], zmm0
+	vzeroupper	; Might not be needed
+	mov eax, edi	; Return destination
+	pop edi
+	ret
+
+	align 16
+.above4Megs:
+	vmovntdq [eax + edx], zmm0
+	add edx, 0x40
+	jnz .above4Megs
+
+	sfence
+	jmp .finish
+
+	align 16
+.less80:
+	; Short counts, AVX512BW-only
+	; Count = 0x41-0x80
+	vmovdqu64 [edx], zmm0
+	add edx, 0x40
+	sub ecx, 0x40
+
+.less40:
+	; Count = 0-0x40
+	or eax, -1		; If count = 1-31 | If count = 32-63
+	bzhi eax, eax, ecx	; count 1s        | all 1's
+	kmovd k1, eax
+	xor eax, eax
+	sub ecx, 0x20
+	cmovb ecx, eax	; 0               | count-32
+	dec eax
+	bzhi eax, eax, ecx
+	kmovd k2, eax	; 0               | count-32 1s
+	kunpckdq k3, k2, k1	; Low 32 bits from k1, high 32 bits from k2 : total = count 1s
+	vmovdqu8 [edx]{k3}, zmm0
+	vzeroupper
+	mov eax, edi	; Return destination
+	pop edi
+	ret
 
 
 
