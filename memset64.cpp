@@ -20,25 +20,25 @@ extern "C"
 
 int main()
 {
-	const static std::array<memsetFunc, 13> funcs =
+	const static std::array funcs =
 	{
-		{
-			{memset, "system libc memset"},
-			{pdclibMemset, "pdclib memset"},
-			{cloudlibcMemset, "cloudlibc memset"},
-			{libFtMemset, "libft memset"},
-			{klibcMemset, "klibc memset"},
-			{neatlibcMemset, "neatlibc memset"},
-			{dietlibcMemset, "dietlibc memset"},
-			{uClibcMemset, "uClibc memset"},
-			{newlibMemset, "newlib memset"},
-			{muslMemset, "musl memset"},
-	#ifdef HAVE_SSE2
-			{bionicSSE2SlmMemset, "bionic SSE2 memset"},
-	#endif
-			{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
-			{inlineStringOpGccSkylakeMemset, "-minline-all-stringops -march=skylake gcc memset"}
-		}
+		memsetFunc{memset, "system libc memset"},
+		memsetFunc{pdclibMemset, "pdclib memset"},
+		memsetFunc{cloudlibcMemset, "cloudlibc memset"},
+		memsetFunc{libFtMemset, "libft memset"},
+		memsetFunc{klibcMemset, "klibc memset"},
+		memsetFunc{neatlibcMemset, "neatlibc memset"},
+		memsetFunc{dietlibcMemset, "dietlibc memset"},
+		memsetFunc{uClibcMemset, "uClibc memset"},
+		memsetFunc{newlibMemset, "newlib memset"},
+		memsetFunc{muslMemset, "musl memset"},
+
+#ifdef HAVE_SSE2
+		memsetFunc{bionicSSE2SlmMemset, "bionic SSE2 memset"},
+#endif
+
+		memsetFunc{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
+		memsetFunc{inlineStringOpGccSkylakeMemset, "-minline-all-stringops -march=skylake gcc memset"}
 	};
 
 	benchFunctions(funcs, std::cout);

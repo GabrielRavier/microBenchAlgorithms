@@ -198,6 +198,8 @@ template <typename T> void benchFunctions(T funcs, std::ostream& out)
 		std::vector<benchResult> resultsCurrentSizeUnaligned;
 		for (auto func : funcs)
 		{
+			if (!func)
+				continue;
 			benchResult resultAligned, resultUnaligned;
 			doBenchAligns(sizeTime.first, sizeTime.second, func, out, resultAligned, resultUnaligned);
 			resultsCurrentSizeAligned.push_back(resultAligned);

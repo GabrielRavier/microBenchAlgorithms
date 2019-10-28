@@ -8,6 +8,7 @@ global uClibcMemset
 global newlibMemset
 global muslMemset
 global bionicSSE2SlmMemset
+global asmlibSSE2Memset
 global freeBsdMemset
 global freeBsdErmsMemset
 global inlineStringOpGccMemset
@@ -15,17 +16,27 @@ global inlineStringOpGccSkylakeMemset
 
 section .text align=16
 
+%define rDestination rdi
+%define rDestination32 edi
+%define rLength rdx
+%define rLength32 edx
+%define rLength8 dl
+%define rFill rsi
+%define rFill32 esi
+%define rFill16 si
+%define rFill8 sil
+
 	align 16
 pdclibMemset:
-	mov rax, rdi
-	lea r8, [rdi + rdx]
-	mov rcx, rdi
-	test rdx, rdx
+	mov rax, rDestination
+	lea r8, [rDestination + rLength]
+	mov rcx, rDestination
+	test rLength, rLength
 	je .return
 
 .loop:
 	inc rcx
-	mov [rcx - 1], sil
+	mov [rcx - 1], rFill8
 	cmp rcx, r8
 	jne .loop
 
@@ -38,20 +49,20 @@ pdclibMemset:
 
 	align 16
 cloudlibcMemset:
-	mov rax, rdi
-	mov rcx, rdi
-	cmp rdx, 0x1F
+	mov rax, rDestination
+	mov rcx, rDestination
+	cmp rLength, 0x1F
 	jbe .small
 
 	test al, 7
 	je .aligned
 
-	mov edi, esi
+	mov edi, rFill32
 	mov r8, rax
 
 .alignLoop:
 	inc r8
-	mov rcx, rdx
+	mov rcx, rLength
 	sub rcx, r8
 	lea r9, [rax + rcx]
 	mov [r8 - 1], dil
@@ -60,7 +71,7 @@ cloudlibcMemset:
 	jne .alignLoop
 
 .afterAlignLoop:
-	movzx edx, sil
+	movzx edx, rFill8
 	mov rcx, rdx
 	sal rcx, 8
 	or rcx, rdx
@@ -94,7 +105,7 @@ cloudlibcMemset:
 
 .endLoop:
 	inc rcx
-	mov [rcx - 1], sil
+	mov [rcx - 1], rFill8
 	cmp rcx, r8
 	jne .endLoop
 
@@ -102,8 +113,8 @@ cloudlibcMemset:
 	ret
 
 .aligned:
-	mov r8, rdi
-	mov r9, rdx
+	mov r8, rDestination
+	mov r9, rLength
 	jmp .afterAlignLoop
 
 
@@ -112,12 +123,12 @@ cloudlibcMemset:
 
 	align 16
 libFtMemset:
-	cmp rdx, 0
+	cmp rLength, 0
 	je .end
 
-	mov r8, rdi	; Saving dest to be restored later
-	mov rax, rsi
-	mov rcx, rdx	; Setting len iterations
+	mov r8, rDestination	; Saving dest to be restored later
+	mov rax, rFill
+	mov rcx, rLength	; Setting len iterations
 	cld	; ++rdi at each iteration
 	rep stosb	; *rdi = c
 
@@ -131,17 +142,17 @@ libFtMemset:
 
 	align 16
 klibcMemset:
-	mov rcx, rdx
-	movzx eax, sil
+	mov rcx, rLength
+	movzx eax, rFill8
 	mov rsi, 0x101010101010101
-	mov r8, rdi
+	mov r8, rDestination
 	shr rcx, 3
 	imul rax, rsi
-	and edx, 7
+	and rLength32, 7
 	cld
 	rep stosq
 
-	mov ecx, edx
+	mov ecx, rLength32
 	rep stosb
 
 	mov rax, r8
@@ -153,9 +164,9 @@ klibcMemset:
 
 	align 16
 neatlibcMemset:
-	mov rcx, rdx
-	mov rax, rsi
-	mov rdx, rdi
+	mov rcx, rLength
+	mov rax, rFill
+	mov rdx, rDestination
 	cld
 	rep stosb
 	mov rax, rdx
@@ -167,15 +178,15 @@ neatlibcMemset:
 
 	align 16
 dietlibcMemset:
-	movzx eax, sil
+	movzx eax, rFill8
 	mov rsi, 0x101010101010101
 	imul rax, rsi
-	mov rsi, rdi
-	mov rcx, rdx
+	mov rsi, rDestination
+	mov rcx, rLength
 	shr rcx, 3
 	rep stosq
 
-	mov rcx, rdx
+	mov rcx, rLength
 	and rcx, 7
 	rep stosb
 
@@ -188,13 +199,13 @@ dietlibcMemset:
 
 	align 16
 uClibcMemset:
-	cmp rdx, 7  ; Check for small lengths
-	mov rcx, rdi    ; Save ptr as return value
+	cmp rLength, 7  ; Check for small lengths
+	mov rcx, rDestination    ; Save ptr as return value
 	jbe .less7
 
 	; Populate 8 bit data to full 64 bit
 	mov r8, 0x101010101010101
-	movzx eax, sil
+	movzx eax, rFill8
 	imul r8, rax
 
     test edi, 7	; Check for alignment
@@ -203,19 +214,19 @@ uClibcMemset:
 	align 16
 .align8:
 	; Align pointer to 8 bytes
-	mov [rcx], sil
-	dec rdx
+	mov [rcx], rFill8
+	dec rLength
 	inc rcx
 	test cl, 7
 	jnz .align8
 
 .checkLarge:
 	; Check for really large regions
-	mov rax, rdx
+	mov rax, rLength
 	shr rax, 6
 	je .fillFinalBytes
 
-	cmp rdx, 120000
+	cmp rLength, 120000
 	jae .largeLoop
 
 	align 16
@@ -236,7 +247,7 @@ uClibcMemset:
 .fillFinalBytes:
 	; Fill final bytes
 	and edx, 0x3F
-	mov rax, rdx
+	mov rax, rLength
 	shr rax, 3
 	je .after8ByteChunks
 
@@ -248,22 +259,22 @@ uClibcMemset:
 	jne .byte8Chunks
 
 .after8ByteChunks:
-	and edx, 7
+	and rLength32, 7
 
 .less7:
-	test rdx, rdx
+	test rLength, rLength
 	je .return
 
 .byteLoop:
 	; And finally as bytes (up to 7)
-	mov [rcx], sil
+	mov [rcx], rFill8
 	inc rcx
-	dec rdx
+	dec rLength
 	jne .byteLoop
 
 .return:
 	; Load result
-	mov rax, rdi	; Start address of destination is result
+	mov rax, rDestination	; Start address of destination is result
 	ret
 
 	align 16
@@ -289,56 +300,56 @@ uClibcMemset:
 
 	align 16
 newlibMemset:
-	mov r9, rdi	; Save return value
-	mov rax, rsi
-	mov rcx, rdx
-	cmp rdx, 16
+	mov r9, rDestination	; Save return value
+	mov rax, rFill
+	mov rcx, rLength
+	cmp rLength, 16
 	jb .byteSet
 
-	mov r8, rdi	; Align on qword boundary
+	mov r8, rDestination	; Align on qword boundary
 	and r8, 7
 	jz .quadwordAligned
 
 	mov rcx, 8
 	sub rcx, r8
-	sub rdx, rcx
+	sub rLength, rcx
 	rep stosb
-	mov rcx, rdx
+	mov rcx, rLength
 
 .quadwordAligned:
 	mov r8, 0x101010101010101
-	movzx eax, sil
+	movzx eax, rFill8
 	imul rax, r8
-	cmp rdx, 256
+	cmp rLength, 256
 	jb .quadwordSet
 
 	shr rcx, 7	; Store 128 bytes at a time with minimum cache pollution
 
 	align 16
 .loop:
-	movnti [rdi], rax
-	movnti [rdi + 8], rax
-	movnti [rdi + 16], rax
-	movnti [rdi + 24], rax
-	movnti [rdi + 32], rax
-	movnti [rdi + 40], rax
-	movnti [rdi + 48], rax
-	movnti [rdi + 56], rax
-	movnti [rdi + 64], rax
-	movnti [rdi + 72], rax
-	movnti [rdi + 80], rax
-	movnti [rdi + 88], rax
-	movnti [rdi + 96], rax
-	movnti [rdi + 104], rax
-	movnti [rdi + 112], rax
-	movnti [rdi + 120], rax
+	movnti [rDestination], rax
+	movnti [rDestination + 8], rax
+	movnti [rDestination + 16], rax
+	movnti [rDestination + 24], rax
+	movnti [rDestination + 32], rax
+	movnti [rDestination + 40], rax
+	movnti [rDestination + 48], rax
+	movnti [rDestination + 56], rax
+	movnti [rDestination + 64], rax
+	movnti [rDestination + 72], rax
+	movnti [rDestination + 80], rax
+	movnti [rDestination + 88], rax
+	movnti [rDestination + 96], rax
+	movnti [rDestination + 104], rax
+	movnti [rDestination + 112], rax
+	movnti [rDestination + 120], rax
 
-	lea rdi, [rdi + 128]
+	lea rDestination, [rDestination + 128]
 	dec rcx
 	jnz .loop
 
 	sfence
-	mov rcx, rdx
+	mov rcx, rLength
 	and rcx, 127
 	rep stosb
 
@@ -356,7 +367,7 @@ newlibMemset:
 	shr rcx, 3
 	rep stosq
 
-	mov rcx, rdx
+	mov rcx, rLength
 	and rcx, 7
 	rep stosb	; Store the remaining bytes
 
@@ -369,62 +380,62 @@ newlibMemset:
 
 	align 16
 muslMemset:
-	movzx rax, sil
+	movzx rax, rFill8
 	mov r8, 0x101010101010101
 	imul rax, r8
 
-	cmp rdx, 126
+	cmp rLength, 126
 	ja .doStosq
 
-	test edx, edx
+	test rLength32, rLength32
 	jz .return
 
-	mov [rdi], sil
-	mov [rdi + rdx - 1], sil
+	mov [rDestination], sil
+	mov [rDestination + rLength - 1], sil
 	cmp edx, 2
 	jbe .return
 
-	mov [rdi + 1], ax
-	mov [rdi + rdx - 3], ax
+	mov [rDestination + 1], ax
+	mov [rDestination + rLength - 3], ax
 	cmp edx, 6
 	jbe .return
 
-	mov [rdi + 3], eax
-	mov [rdi + rdx - 7], eax
+	mov [rDestination + 3], eax
+	mov [rDestination + rLength - 7], eax
 	cmp edx, 14
 	jbe .return
 
-	mov [rdi + 7], rax
-	mov [rdi + rdx - 15], rax
+	mov [rDestination + 7], rax
+	mov [rDestination + rLength - 15], rax
 	cmp edx, 30
 	jbe .return
 
-	mov [rdi + 15], rax
-	mov [rdi + 23], rax
-	mov [rdi + rdx - 31], rax
-	mov [rdi + rdx - 23], rax
+	mov [rDestination + 15], rax
+	mov [rDestination + 23], rax
+	mov [rDestination + rLength - 31], rax
+	mov [rDestination + rLength - 23], rax
 	cmp edx, 62
 	jbe .return
 
-	mov [rdi + 31], rax
-	mov [rdi + 39], rax
-	mov [rdi + 47], rax
-	mov [rdi + 55], rax
-	mov [rdi + rdx - 63], rax
-	mov [rdi + rdx - 55], rax
-	mov [rdi + rdx - 47], rax
-	mov [rdi + rdx - 39], rax
+	mov [rDestination + 31], rax
+	mov [rDestination + 39], rax
+	mov [rDestination + 47], rax
+	mov [rDestination + 55], rax
+	mov [rDestination + rLength - 63], rax
+	mov [rDestination + rLength - 55], rax
+	mov [rDestination + rLength - 47], rax
+	mov [rDestination + rLength - 39], rax
 
 .return:
-	mov rax, rdi
+	mov rax, rDestination
 	ret
 
 	align 16
 .doStosq:
-	test edi, 15
-	mov r8, rdi
-	mov [rdi + rdx - 8], rax
-	mov rcx, rdx
+	test rDestination32, 15
+	mov r8, rDestination
+	mov [rDestination + rLength - 8], rax
+	mov rcx, rLength
 	jnz .makeAlign
 
 .finishStosq:
@@ -437,12 +448,12 @@ muslMemset:
 	align 16
 .makeAlign:
 	xor edx, edx
-	sub edx, edi
+	sub edx, rDestination32
 	and edx, 15
-	mov [rdi], rax
-	mov [rdi + 8], rax
+	mov [rDestination], rax
+	mov [rDestination + 8], rax
 	sub rcx, rdx
-	add rdi, rdx
+	add rDestination, rdx
 	jmp .finishStosq
 
 
@@ -451,66 +462,66 @@ muslMemset:
 
 	align 16
 bionicSSE2SlmMemset:
-	mov rax, rdi
-	and rsi, 0xFF
+	mov rax, rDestination
+	and rFill, 0xFF
 	mov rcx, 0x101010101010101
 	imul rcx, rsi
-	cmp rdx, 16
+	cmp rLength, 16
 	jae .sixteenBytesOrMore
 
-	test dl, 8
+	test rLength8, 8
 	jnz .eightTo15Bytes
 
-	test dl, 4
+	test rLength8, 4
 	jnz .fourTo7Bytes
 
-	test dl, 2
+	test rLength8, 2
 	jnz .twoTo3Bytes
 
-	test dl, 1
+	test rLength8, 1
 	jz .return
 
-	mov [rdi], cl
+	mov [rDestination], cl
 
 .return:
 	ret
 
 	align 16
 .eightTo15Bytes:
-	mov [rdi], rcx
-	mov [rdi + rdx - 8], rcx
+	mov [rDestination], rcx
+	mov [rDestination + rLength - 8], rcx
 	ret
 
 	align 16
 .fourTo7Bytes:
-	mov [rdi], ecx
-	mov [rdi + rdx - 4], ecx
+	mov [rDestination], ecx
+	mov [rDestination + rLength - 4], ecx
 	ret
 
 	align 16
 .twoTo3Bytes:
-	mov [rdi], cx
-	mov [rdi + rdx - 2], cx
+	mov [rDestination], cx
+	mov [rDestination + rLength - 2], cx
 	ret
 
 	align 16
 .sixteenBytesOrMore:
 	movq xmm0, rcx
 	pshufd xmm0, xmm0, 0
-	movdqu [rdi], xmm0
-	movdqu [rdi + rdx - 16], xmm0
+	movdqu [rDestination], xmm0
+	movdqu [rDestination + rLength - 16], xmm0
 	cmp rdx, 32
 	jbe .thirtyTwoBytesLess
 
-	movdqu [rdi + 16], xmm0
-	movdqu [rdi + rdx - 32], xmm0
+	movdqu [rDestination + 16], xmm0
+	movdqu [rDestination + rLength - 32], xmm0
 	cmp rdx, 64
 	jbe .sixtyFourBytesLess
 
-	movdqu [rdi + 32], xmm0
-	movdqu [rdi + 48], xmm0
-	movdqu [rdi + rdx - 64], xmm0
-	movdqu [rdi + rdx - 48], xmm0
+	movdqu [rDestination + 32], xmm0
+	movdqu [rDestination + 48], xmm0
+	movdqu [rDestination + rLength - 64], xmm0
+	movdqu [rDestination + rLength - 48], xmm0
 	cmp rdx, 128
 	ja .oneHundrendTwentyEightBytesMore
 
@@ -520,10 +531,10 @@ bionicSSE2SlmMemset:
 
 	align 16
 .oneHundrendTwentyEightBytesMore:
-	lea rcx, [rdi + 64]
+	lea rcx, [rDestination + 64]
 	and rcx, -64
-	mov r8, rdx
-	add rdx, rdi
+	mov r8, rLength
+	add rdx, rDestination
 	and rdx, -64
 	cmp rdx, rcx
 	je .return
@@ -560,11 +571,355 @@ bionicSSE2SlmMemset:
 
 
 
+%macro mkAsmlibLoadParamsAndBroadcastFillExtraParam 0
+	movzx eax, rFill8
+	mov rcx, rLength
+	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
+%endmacro
+
+%macro mkAsmlibSSE2StartSSE 0
+	; count > 16. Use SSE2
+	movd xmm0, eax
+	pshufd xmm0, xmm0, 0	; Broadcast c into all bytes of xmm0
+
+	; Store the first unaligned part
+	; The size of this part is 1 - 16 bytes
+	; It is faster to write 16 bytes, possibly overlapping with the subsequent regular part, than to make possibly mispredicted branches depending on the size of the first part
+	movq [rDestination], xmm0
+	movq [rDestination + 8], xmm0
+
+	; Check if count very big
+	cmp rLength, 1024 * 1024 * 4
+	ja .above4Megs	; Use non-temporal store if count > 1M (typical size of cache)
+%endmacro
+
+%macro mkAsmlibSSE2ThreeStores 4
+.small%1:
+	mov [edx + %2], eax
+
+.small%2:
+	mov [edx + %3], eax
+
+.small%3:
+	mov [edx + %4], eax
+
+.small%4:
+%endmacro
+
+%macro mkAsmLibSSE2RegularLoop 3
+	; End of regular part
+	; Round down dest + count to nearest preceding 16-byte boundary
+	lea rLength, [rDestination + rLength - 1]
+	and rLength, -0x10
+
+	; Start of regular part
+	; Round up dest to next 16-byte boundary
+	add rDestination, 0x10
+	and rDestination, -0x10
+
+	; -(size of regular part)
+	sub rDestination, rLength
+	jnl .lastIrregular%2	; Jump if not negative
+
+.regularPartLoop%2:
+	; Loop through regular part
+	; rLength = end of regular part
+	; rDestination = negative index from the end, counting up to zero
+	%1 [rLength + rDestination], xmm0
+	add edx, 0x10
+	jnz .regularPartLoop%2
+
+%if %3 == 1
+	sfence
+%endif
+
+.lastIrregular%2:
+	; Do the last irregular part
+	; The size of that part is 1 - 16 bytes
+	; It is faster to always write 16 bytes, possibly overlapping with the preceding regular part, than to make possibly mispredicted branches depending on the size of the last part
+	mov rax, rDest2
+	movq [rax + rCount2 - 0x10], xmm0
+	movq [rax + rCount2 - 8], xmm0
+	ret
+%endmacro
+
+	align 16
+asmlibSSE2Memset:
+	mkAsmlibLoadParamsAndBroadcastFill
+	mov rDest2, rDestination	; Save destination
+
+	cmp rLength, 16
+	ja .above16
+
+.less16:
+	jmp [.jumpTable + ecx * 4]
+
+
+	align 16
+	mkAsmlibSSE2ThreeStores 16, 12, 8, 4
+
+	mov [edx], eax
+
+.small0:
+	mkReturnDestinationFromStackNoPop
+
+	align 16
+	mkAsmlibSSE2ThreeStores 15, 11, 7, 3
+	mov [edx + 1], eax
+	mov [edx], al
+	mkReturnDestinationFromStackNoPop
+
+	align 16
+	mkAsmlibSSE2ThreeStores 14, 10, 6, 2
+	mov [edx], ax
+	mkReturnDestinationFromStackNoPop
+
+	align 16
+	mkAsmlibSSE2ThreeStores 13, 9, 5, 1
+	mov [edx], al
+	mkReturnDestinationFromStackNoPop
+
+	align 16
+.jumpTable:
+	dd .small0, .small1, .small2, .small3, .small4, .small5, .small6, .small7, .small8, .small9, .small10, .small11, .small12, .small13, .small14, .small15, .small16
+
+	align 16
+.above16:
+	mkAsmlibSSE2StartSSE
+	mkAsmLibSSE2RegularLoop movdqa, Normal, 0
+
+	align 16
+.above4Megs:
+	; Use non-temporal stores, same code as above
+	mkAsmLibSSE2RegularLoop movdqu, NonTemporal, 0
+
+
+
+
+
+	align 16
+asmlibSSE2v2Memset:
+	mkAsmlibLoadParamsAndBroadcastFill
+
+	cmp ecx, 16
+	jna asmlibSSE2Memset.less16
+
+	mkAsmlibSSE2StartSSE
+	mkAsmLibSSE2RegularLoop movdqa, Normal, 0
+
+.above4Megs:
+	; Use non-temporal stores, same code as above
+	mkAsmLibSSE2RegularLoop movntdq, NonTemporal, 1
+
+
+
+
+
+%macro mkAsmlibAVXPrologAVX 1
+	; Find last 32 bytes boundary
+	mov ecx, eax
+	and ecx, -0x20
+
+	; -size of 32-bytes blocks
+	sub edx, ecx
+	jnb .finish%1	; Jump if not negative
+
+	; Extend value to 256 bits
+	vinsertf128	ymm0, xmm0, 1
+%endmacro
+
+%macro mkAsmlibAVXFinishAVX 1
+
+.finish%1:
+	; The last part from ecx to eax is < 32 bytes. Write 32 bytes with overlap
+	movups [eax - 0x20], xmm0
+	movups [eax - 0x10], xmm0
+	mkReturnDestinationFromStackNoPop
+
+%endmacro
+
+	align 16
+asmlibAVXMemset:
+	mkAsmlibLoadParamsAndBroadcastFill
+
+.entryAVX512F:
+	cmp ecx, 16
+	jna asmlibSSE2Memset.less16
+
+	; Length > 16
+	movd xmm0, eax
+	pshufd xmm0, xmm0, 0	; Broadcast c into all bytes of xmm0
+	lea eax, [edx + ecx]	; Point to end
+
+	cmp ecx, 0x20
+	jbe .less32
+
+	; Store the first unaligned 16 bytes
+	; It is faster to always write 16 bytes, possibly overlapping with the subsequent regular part, than to make possibly mispredicted branches depending on the size of the first part
+	movups [edx], xmm0
+
+	; Store another 16 bytes, aligned
+	add edx, 0x10
+	and edx, -0x10
+	movaps [edx], xmm0
+
+	; Go to next 32 bytes boundary
+	add edx, 0x10
+	and edx, -0x20
+
+	; Check if count very big
+	cmp ecx, 1024 * 1024 * 4
+	ja .above4Megs	; Use non-temporal stores if count > 4M
+
+	mkAsmlibAVXPrologAVX Normal
+
+.loop32:
+	; Loop through 32-byte blocks
+	; ecx = end of 32-byte blocks
+	; edx = negative index from the end, counting up to zero
+	vmovaps [ecx + edx], ymm0
+	add edx, 0x20
+	jnz .loop32
+
+	vzeroupper
+	mkAsmlibAVXFinishAVX Normal
+
+	align 16
+.above4Megs:
+	; Use non-temporal moves, same code as above
+	mkAsmlibAVXPrologAVX NonTemporal
+
+	align 16
+.loop32NonTemporal:
+	; Loop through 32-byte blocks
+	; ecx = end of 32-byte blocks
+	; edx = negative index from the end, counting up to zero
+	vmovntps [ecx + edx], ymm0
+	add edx, 0x20
+	jnz .loop32NonTemporal
+
+	sfence
+	vzeroupper
+	mkAsmlibAVXFinishAVX NonTemporal
+
+.less32:
+	; 16 < count <= 32
+	movups [edx], xmm0
+	movups [eax - 0x10], xmm0
+	mkReturnDestinationFromStackNoPop
+
+
+
+
+
+%macro mkAsmlibAVX512SaveAndBroadcastIntoZmm 0
+
+	push edi
+	mov edi, edx	; Save dest
+	vpbroadcastd zmm0, eax	; Broadcast further into 64 bytes
+
+%endmacro
+
+	align 16
+asmlibAVX512FMemset:
+	mkAsmlibLoadParamsAndBroadcastFill
+	cmp ecx, 0x80
+	jbe asmlibAVXMemset.entryAVX512F	; Use AVX code if count <= 0x80
+
+	mkAsmlibAVX512SaveAndBroadcastIntoZmm
+	jmp asmlibAVX512BWMemset.entryAVX512F	; Use AVX512BW code
+
+
+
+
+
+	align 16
+asmlibAVX512BWMemset:
+	mkAsmlibLoadParamsAndBroadcastFill
+	mkAsmlibAVX512SaveAndBroadcastIntoZmm
+
+	cmp ecx, 0x40
+	jbe .less40
+
+	cmp ecx, 0x80
+	jbe .less80	; Use simpler code if count <= 0x80
+
+.entryAVX512F:
+	; Count > 0x80
+	; Store first 0x40 bytes
+	vmovdqu64 [edx], zmm0
+
+	; Find first 0x40 boundary
+	add edx, 0x40
+	and edx, -0x40
+
+	; Find last 0x40 boundary
+	lea eax, [edi + ecx]
+	and eax, -0x40
+	sub edx, eax	; Negative count from last 0x40 boundary
+
+	; Check if count very big
+	cmp ecx, 1024 * 1024 * 4
+	ja .above4Megs	; Use non-temporal store if count > 4M
+
+.avx512MainLoop:
+	vmovdqa64 [eax + edx], zmm0
+	add edx, 0x40
+	jnz .avx512MainLoop
+
+.finish:
+	; Remaining 0-0x3F bytes
+	; Overlap previous bytes
+	vmovdqu64 [edi + ecx - 0x40], zmm0
+	vzeroupper	; Might not be needed
+	mov eax, edi	; Return destination
+	pop edi
+	ret
+
+	align 16
+.above4Megs:
+	vmovntdq [eax + edx], zmm0
+	add edx, 0x40
+	jnz .above4Megs
+
+	sfence
+	jmp .finish
+
+	align 16
+.less80:
+	; Short counts, AVX512BW-only
+	; Count = 0x41-0x80
+	vmovdqu64 [edx], zmm0
+	add edx, 0x40
+	sub ecx, 0x40
+
+.less40:
+	; Count = 0-0x40
+	or eax, -1		; If count = 1-31 | If count = 32-63
+	bzhi eax, eax, ecx	; count 1s        | all 1's
+	kmovd k1, eax
+	xor eax, eax
+	sub ecx, 0x20
+	cmovb ecx, eax	; 0               | count-32
+	dec eax
+	bzhi eax, eax, ecx
+	kmovd k2, eax	; 0               | count-32 1s
+	kunpckdq k3, k2, k1	; Low 32 bits from k1, high 32 bits from k2 : total = count 1s
+	vmovdqu8 [edx]{k3}, zmm0
+	vzeroupper
+	mov eax, edi	; Return destination
+	pop edi
+	ret
+
+
+
+
+
 %macro mkFreeBsdMemset 1
 	; 1 : Whether we have ERMS (Enhanced MOVSB) or not
-	mov rax, rdi
-	mov rcx, rdx
-	movzx r8, sil
+	mov rax, rDestination
+	mov rcx, rLength
+	movzx r8, rFill8
 	mov r10, 0x101010101010101
 	imul r10, r8
 
@@ -575,11 +930,11 @@ bionicSSE2SlmMemset:
 	ja .above256
 
 .thirtyTwoByteLoop:
-	mov [rdi], r10
-	mov [rdi + 8], r10
-	mov [rdi + 16], r10
-	mov [rdi + 24], r10
-	lea rdi, [rdi + 32]
+	mov [rDestination], r10
+	mov [rDestination + 8], r10
+	mov [rDestination + 16], r10
+	mov [rDestination + 24], r10
+	lea rDestination, [rDestination + 32]
 	sub rcx, 32
 	cmp rcx, 32
 	ja .thirtyTwoByteLoop
@@ -588,8 +943,8 @@ bionicSSE2SlmMemset:
 	ja .above16
 
 	; Less than 16 remain
-	mov [rdi + rcx - 16], r10
-	mov [rdi + rcx - 8], r10
+	mov [rDestination + rcx - 16], r10
+	mov [rDestination + rcx - 8], r10
 	ret
 
 	align 16
@@ -599,10 +954,10 @@ bionicSSE2SlmMemset:
 
 .above16:
 	; Between 16 and 32
-	mov [rdi], r10
-	mov [rdi + 8], r10
-	mov [rdi + rcx - 16], r10
-	mov [rdi + rcx - 8], r10
+	mov [rDestination], r10
+	mov [rDestination + 8], r10
+	mov [rDestination + rcx - 16], r10
+	mov [rDestination + rcx - 8], r10
 	ret
 
 	align 16
@@ -610,8 +965,8 @@ bionicSSE2SlmMemset:
 	cmp cl, 8
 	jl .less8
 
-	mov [rdi], r10
-	mov [rdi + rcx - 8], r10
+	mov [rDestination], r10
+	mov [rDestination + rcx - 8], r10
 	ret
 
 	align 16
@@ -619,8 +974,8 @@ bionicSSE2SlmMemset:
 	cmp cl, 4
 	jl .less4
 
-	mov [rdi], r10d
-	mov [rdi + rcx - 4], r10d
+	mov [rDestination], r10d
+	mov [rDestination + rcx - 4], r10d
 	ret
 
 	align 16
@@ -628,8 +983,8 @@ bionicSSE2SlmMemset:
 	cmp cl, 2
 	jl .less2
 
-	mov [rdi], r10w
-	mov [rdi + rcx - 2], r10w
+	mov [rDestination], r10w
+	mov [rDestination + rcx - 2], r10w
 	ret
 
 	align 16
@@ -637,16 +992,16 @@ bionicSSE2SlmMemset:
 	cmp cl, 0
 	je .return
 
-	mov [rdi], r10b
+	mov [rDestination], r10b
 
 .return:
 	ret
 
 	align 16
 .above256:
-	mov r9, rdi
+	mov r9, rDestination
 	mov rax, r10
-	test edi, 15
+	test rDestination32, 0xF
 	jnz .unaligned
 
 .doRep:
@@ -672,13 +1027,13 @@ bionicSSE2SlmMemset:
 
 	align 16
 .unaligned:
-	mov [rdi], r10
-	mov [rdi + 8], r10
-	mov r8, rdi
+	mov [rDestination], r10
+	mov [rDestination + 8], r10
+	mov r8, rDestination
 	and r8, 15
 	lea rcx, [rcx + r8 - 16]
 	neg r8
-	lea rdi, [rdi + r8 + 16]
+	lea rDestination, [rDestination + r8 + 16]
 	jmp .doRep
 %endmacro
 
@@ -700,35 +1055,35 @@ freeBsdErmsMemset:
 
 	align 16
 inlineStringOpGccMemset:
-	movzx eax, sil
-	mov r8, rdi
+	movzx eax, rFill8
+	mov r8, rDestination
 	mov rsi, 0x101010101010101
 	imul rax, rsi
-	cmp rdx, 8
+	cmp rLength, 8
 	jnb .aligned
 
-	test dl, 4
+	test rLength8, 4
 	jne .small
 
-	test rdx, rdx
+	test rLength, rLength
 	je .return
 
-	mov [rdi], al
-	test dl, 2
+	mov [rDestination], al
+	test rLength8, 2
 	je .return
 
-	mov [rdi + rdx - 2], ax
+	mov [rDestination + rLength - 2], ax
 	jmp .return
 
 	align 16
 .aligned:
-	mov [rdi], rax
-	lea rdi, [rdi + 8]
+	mov [rDestination], rax
+	lea rDestination, [rDestination + 8]
 	mov rcx, r8
-	mov [rdi + rdx - 16], ax
+	mov [rDestination + rdx - 16], ax
 	and rdi, -8
 	sub rcx, rdi
-	add rcx, rdx
+	add rcx, rLength
 	shr rcx, 3
 	rep stosq
 
@@ -738,8 +1093,8 @@ inlineStringOpGccMemset:
 
 	align 16
 .small:
-	mov [rdi], eax
-	mov [rdi + rdx - 4], eax
+	mov [rDestination], eax
+	mov [rDestination + rLength - 4], eax
 	jmp .return
 
 
@@ -748,24 +1103,24 @@ inlineStringOpGccMemset:
 
 	align 16
 inlineStringOpGccSkylakeMemset:
-	movzx esi, sil
+	movzx rFill32, rFill8
 	mov rcx, 0x101010101010101
-	imul rsi, rcx
+	imul rFill, rcx
 
-	mov rax, rdi
-	cmp rdx, 0x20
+	mov rax, rDestination
+	cmp rLength, 0x20
 	jnb .toLoop
 
-	test dl, 0x10
+	test rLength8, 0x10
 	jne .seventeenTo32
 
-	test dl, 8
+	test rLength8, 8
 	jne .nineTo16
 
-	test dl, 4
+	test rLength8, 4
 	jne .fiveTo8
 
-	test rdx, rdx
+	test rLength, rLength
 	jne .oneTo4
 
 .return:
@@ -773,16 +1128,16 @@ inlineStringOpGccSkylakeMemset:
 
 	align 16
 .toLoop:
-	mov [rdi], rsi
-	mov [rdi + rdx - 32], rsi
-	mov [rdi + rdx - 24], rsi
-	mov [rdi + rdx - 16], rsi
-	mov [rdi + rdx - 8], rsi
-	lea rdi, [rdi + 8]
-	and rdi, -8
+	mov [rDestination], rFill
+	mov [rDestination + rLength - 32], rFill
+	mov [rDestination + rLength - 24], rFill
+	mov [rDestination + rLength - 16], rFill
+	mov [rDestination + rLength - 8], rFill
+	lea rDestination, [rDestination + 8]
+	and rDestination, -8
 
 	mov rcx, rax
-	sub rcx, rdi
+	sub rcx, rDestination
 	add rdx, rcx
 	and rdx, -0x20
 	cmp rdx, 0x20
@@ -792,10 +1147,10 @@ inlineStringOpGccSkylakeMemset:
 	xor ecx, ecx
 
 .bigLoop:
-	mov [rdi + rcx], rsi
-	mov [rdi + rcx + 8], rsi
-	mov [rdi + rcx + 0x10], rsi
-	mov [rdi + rcx + 0x18], rsi
+	mov [rDestination + rcx], rFill
+	mov [rDestination + rcx + 8], rFill
+	mov [rDestination + rcx + 0x10], rFill
+	mov [rDestination + rcx + 0x18], rFill
 	add rcx, 0x20
 	cmp rcx, rdx
 	jb .bigLoop
@@ -804,29 +1159,29 @@ inlineStringOpGccSkylakeMemset:
 
 	align 16
 .oneTo4:
-	mov [rdi], sil
-	test dl, 2
+	mov [rDestination], rFill8
+	test rLength8, 2
 	je .return
 
-	mov [rdi + rdx - 2], si
+	mov [rDestination + rLength - 2], rFill16
 	ret
 
 	align 16
 .seventeenTo32:
-	mov [rdi], rsi
-	mov [rdi + 8], rsi
-	mov [rdi + rdx - 0x10], rsi
-	mov [rdi + rdx - 8], rsi
+	mov [rDestination], rFill
+	mov [rDestination + 8], rFill
+	mov [rDestination + rLength - 0x10], rFill
+	mov [rDestination + rLength - 8], rFill
 	ret
 
 	align 16
 .nineTo16:
-	mov [rdi], rsi
-	mov [rdi + rdx - 8], rsi
+	mov [rDestination], rFill
+	mov [rDestination + rLength - 8], rFill
 	ret
 
 	align 16
 .fiveTo8:
-	mov [rdi], esi
-	mov [rdi + rdx - 4], esi
+	mov [rDestination], rFill32
+	mov [rDestination + rLength - 4], rFill32
 	ret

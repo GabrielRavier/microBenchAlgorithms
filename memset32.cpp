@@ -34,54 +34,54 @@ extern "C"
 
 int main()
 {
-	const static std::array<memsetFunc, 29> funcs =
+	const static std::array funcs =
 	{
-		{
-			{memset, "system libc memset"},
-			{pdclibMemset, "pdclib memset"},
-			{cloudlibcMemset, "cloudlibc memset"},
-			{klibcMemset, "klibc memset"},
-			{neatlibcMemset, "neatlibc memset"},
-			{dietlibcMemset, "dietlibc memset"},
-			{uClibcMemset, "uClibc memset"},
-			{newlibMemset, "newlib memset"},
-			{newlibSmallMemset, "newlib memset optimized for size"},
-			{muslMemset, "musl memset"},
+		memsetFunc{memset, "system libc memset"},
+		memsetFunc{pdclibMemset, "pdclib memset"},
+		memsetFunc{cloudlibcMemset, "cloudlibc memset"},
+		memsetFunc{klibcMemset, "klibc memset"},
+		memsetFunc{neatlibcMemset, "neatlibc memset"},
+		memsetFunc{dietlibcMemset, "dietlibc memset"},
+		memsetFunc{uClibcMemset, "uClibc memset"},
+		memsetFunc{newlibMemset, "newlib memset"},
+		memsetFunc{newlibSmallMemset, "newlib memset optimized for size"},
+		memsetFunc{muslMemset, "musl memset"},
 
-	#ifdef HAVE_SSE2
-			{bionicSSE2AtomMemset, "bionic SSE2 Atom memset"},
-	#endif
+#ifdef HAVE_SSE2
+		memsetFunc{bionicSSE2AtomMemset, "bionic SSE2 Atom memset"},
+#endif
 
-			{glibcMemset, "glibc memset"},
-			{glibcI586Memset, "glibc i586 memset"},
-			{glibcI686Memset, "glibc i686 memset"},
-			{asmlibMemset, "asmlib memset"},
-	#ifdef HAVE_SSE2
-			{asmlibSSE2Memset, "asmlib SSE2 memset"},
-			{asmlibSSE2v2Memset, "asmlib SSE2 memset v2"},
-	#endif
+		memsetFunc{glibcMemset, "glibc memset"},
+		memsetFunc{glibcI586Memset, "glibc i586 memset"},
+		memsetFunc{glibcI686Memset, "glibc i686 memset"},
+		memsetFunc{asmlibMemset, "asmlib memset"},
 
-	#ifdef HAVE_AVX
-			{asmlibAVXMemset, "asmlib AVX memset"},
-	#endif
+#ifdef HAVE_SSE2
+		memsetFunc{asmlibSSE2Memset, "asmlib SSE2 memset"},
+		memsetFunc{asmlibSSE2v2Memset, "asmlib SSE2 memset v2"},
+#endif
 
-	#ifdef HAVE_AVX512F
-			{asmlibAVX512FMemset, "asmlib AVX512F memset"},
-	#endif
+#ifdef HAVE_AVX
+		memsetFunc{asmlibAVXMemset, "asmlib AVX memset"},
+#endif
 
-	#ifdef HAVE_AVX512BW
-			{asmlibAVX512BWMemset, "asmlib AVX512BW memset"},
-	#endif
-			{msvc2003Memset, "MSVC 2003 memset"},
-			{bytewiseMemset, "bytewise memset"},
-			{minixMemset, "minix memset"},
-			{freeBsdMemset, "FreeBSD memset"},
-			{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
-			{inlineStringOpGccI386Memset, "-minline-all-stringops -march=i386 gcc memset"},
-			{inlineStringOpGccI486Memset, "-minline-all-stringops -march=i486 gcc memset"},
-			{inlineStringOpGccI686Memset, "-minline-all-stringops -march=i686 gcc memset"},
-			{inlineStringOpGccNoconaMemset, "-minline-all-stringops -march=nocona gcc memset"}
-		}
+#ifdef HAVE_AVX512F
+		memsetFunc{asmlibAVX512FMemset, "asmlib AVX512F memset"},
+#endif
+
+#ifdef HAVE_AVX512BW
+		memsetFunc{asmlibAVX512BWMemset, "asmlib AVX512BW memset"},
+#endif
+
+		memsetFunc{msvc2003Memset, "MSVC 2003 memset"},
+		memsetFunc{bytewiseMemset, "bytewise memset"},
+		memsetFunc{minixMemset, "minix memset"},
+		memsetFunc{freeBsdMemset, "FreeBSD memset"},
+		memsetFunc{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
+		memsetFunc{inlineStringOpGccI386Memset, "-minline-all-stringops -march=i386 gcc memset"},
+		memsetFunc{inlineStringOpGccI486Memset, "-minline-all-stringops -march=i486 gcc memset"},
+		memsetFunc{inlineStringOpGccI686Memset, "-minline-all-stringops -march=i686 gcc memset"},
+		memsetFunc{inlineStringOpGccNoconaMemset, "-minline-all-stringops -march=nocona gcc memset"}
 	};
 
 	benchFunctions(funcs, std::cout);
