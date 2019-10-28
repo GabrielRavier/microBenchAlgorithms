@@ -287,3 +287,7 @@ tolower:
 toupper:
 bitTwiddlingAlgos:
 runtimeStuff:
+HackersDelight:
+vectorizedPopcount:
+vectorizedBuiltins:
+vectorizedEverything:
