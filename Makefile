@@ -1,9 +1,8 @@
 TESTS = memset32 memset64
 
-CXXFLAGS = -std=gnu++2a -W -Wall -Wextra
-ASMFLAGS =
+CXXFLAGS = -std=gnu++2a -W -Wall -Wextra -DHAVE_AVX2
 
-ifeq($(RELEASE), 1)
+ifeq ($(RELEASE), 1)
 	CXXFLAGS += -Ofast -s -flto
 else
 	CXXFLAGS += -Og -ggdb3
@@ -26,7 +25,7 @@ obj64/%.o: %.cpp
 
 obj64/%AsmFuncs.o: %.asm
 	@mkdir -p obj64
-	nasm -f elf64 $< -o $@ -$(ASMFLAGS)
+	nasm -f elf64 $< -o $@ $(ASMFLAGS)
 
 memset32: obj32/memset32.o obj32/memset32AsmFuncs.o
 	g++ $^ -o $@ -m32 $(CXXFLAGS)

@@ -8,6 +8,22 @@
 #include <unistd.h>
 #include <utility>
 
+#ifdef HAVE_AVX512BW
+#define HAVE_AVX512F
+#endif
+
+#ifdef HAVE_AVX512F
+#define HAVE_AVX2
+#endif
+
+#ifdef HAVE_AVX2
+#define HAVE_AVX
+#endif
+
+#ifdef HAVE_AVX
+#define HAVE_SSE2
+#endif
+
 using memsetFunc = std::pair<std::function<void *(void *, int, size_t)>, const char *>;
 #define mkMemsetDecl(x) void *x(void *, int, size_t);
 
@@ -62,16 +78,16 @@ inline std::string bytesPerSecondStr(double sizePerSecond)
 		return assembleBytesPerSecondStr(sizePerSecond * 3600.0, "B", "h");
 	else if (sizePerSecond < 1.0)
 		return assembleBytesPerSecondStr(sizePerSecond * 60.0, "B", "m");
-	else if (sizePerSecond < 1000.0)
+	else if (sizePerSecond < 1024.0)
 		return assembleBytesPerSecondStr(sizePerSecond, "B");
-	else if (sizePerSecond < 1000000.0)
-		return assembleBytesPerSecondStr(sizePerSecond / 1000.0, "KB");
-	else if (sizePerSecond < 1000000000.0)
-		return assembleBytesPerSecondStr(sizePerSecond / 1000000.0, "MB");
-	else if (sizePerSecond < 1000000000000.0)
-		return assembleBytesPerSecondStr(sizePerSecond / 1000000000.0, "GB");
+	else if (sizePerSecond < 1024.0 * 1024.0)
+		return assembleBytesPerSecondStr(sizePerSecond / 1024.0, "KB");
+	else if (sizePerSecond < 1024.0 * 1024.0 * 1024.0)
+		return assembleBytesPerSecondStr(sizePerSecond / (1024.0 * 1024.0), "MB");
+	else if (sizePerSecond < 1024.0 * 1024.0 * 1024.0 * 1024.0)
+		return assembleBytesPerSecondStr(sizePerSecond / (1024.0 * 1024.0 * 1024.0), "GB");
 	else
-		return assembleBytesPerSecondStr(sizePerSecond / 1000000000000.0, "TB");
+		return assembleBytesPerSecondStr(sizePerSecond / (1024.0 * 1024.0 * 1024.0 * 1024.0), "TB");
 }
 
 inline std::string assembleTimeStr(double time, const char *unit)
@@ -84,13 +100,13 @@ inline std::string timeStr(double time)
 	if (time < 1000.0)
 		return assembleTimeStr(time, "ns");
 	else if (time < 1000000.0)
-		return assembleTimeStr(time, "ms");
+		return assembleTimeStr(time / 1000.0, "ms");
 	else if (time < 1000000.0 * 60.0)
-		return assembleTimeStr(time, "s");
+		return assembleTimeStr(time / 1000000.0, "s");
 	else if (time < 1000000.0 * 3600.0)
-		return assembleTimeStr(time, "m");
+		return assembleTimeStr(time / (1000000.0 * 60.0), "m");
 	else
-		return assembleTimeStr(time, "h");
+		return assembleTimeStr(time / (1000000.0 * 3600.0), "h");
 }
 
 inline void doOneBench(bool destinationAlign, size_t size, size_t times, memsetFunc memsetPtr, std::ostream& out, benchResult& result)
@@ -177,6 +193,7 @@ template <typename T> void benchFunctions(T funcs, std::ostream& out)
 	std::vector<benchBatchInfo> results;
 	for (auto sizeTime : sizesTimes)
 	{
+		sizeTime.second /= 30;
 		std::vector<benchResult> resultsCurrentSizeAligned;
 		std::vector<benchResult> resultsCurrentSizeUnaligned;
 		for (auto func : funcs)
