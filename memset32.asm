@@ -14,7 +14,7 @@ global glibcI686Memset
 global asmlibMemset
 global asmlibSSE2Memset
 global asmlibSSE2v2Memset
-global asmlibAVXMemset
+global asmlibAVXMemset	; Not valgrind tested
 global asmlibAVX512FMemset	; Untested
 global asmlibAVX512BWMemset	; Untested
 global msvc2003Memset
