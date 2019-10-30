@@ -571,9 +571,9 @@ bionicSSE2SlmMemset:
 
 
 
-%macro mkAsmlibLoadParamsAndBroadcastFillExtraParam 0
+%macro mkAsmlibLoadParamsAndBroadcastFill 0
 	movzx eax, rFill8
-	mov rcx, rLength
+	mov rsi, rLength
 	imul eax, 0x1010101	; Broadcast fill into all bytes of eax
 %endmacro
 
@@ -595,13 +595,13 @@ bionicSSE2SlmMemset:
 
 %macro mkAsmlibSSE2ThreeStores 4
 .small%1:
-	mov [edx + %2], eax
+	mov [rDestination + %2], eax
 
 .small%2:
-	mov [edx + %3], eax
+	mov [rDestination + %3], eax
 
 .small%3:
-	mov [edx + %4], eax
+	mov [rDestination + %4], eax
 
 .small%4:
 %endmacro
@@ -637,16 +637,21 @@ bionicSSE2SlmMemset:
 	; Do the last irregular part
 	; The size of that part is 1 - 16 bytes
 	; It is faster to always write 16 bytes, possibly overlapping with the preceding regular part, than to make possibly mispredicted branches depending on the size of the last part
-	mov rax, rDest2
-	movq [rax + rCount2 - 0x10], xmm0
-	movq [rax + rCount2 - 8], xmm0
+	mov rax, rcx
+	movq [rax + rsi - 0x10], xmm0
+	movq [rax + rsi - 8], xmm0
+	ret
+%endmacro
+
+%macro mkAsmlibReturnDestination 0
+	mov rax, rcx	; Return destination
 	ret
 %endmacro
 
 	align 16
 asmlibSSE2Memset:
 	mkAsmlibLoadParamsAndBroadcastFill
-	mov rDest2, rDestination	; Save destination
+	mov rcx, rDestination	; Save destination
 
 	cmp rLength, 16
 	ja .above16
@@ -658,26 +663,26 @@ asmlibSSE2Memset:
 	align 16
 	mkAsmlibSSE2ThreeStores 16, 12, 8, 4
 
-	mov [edx], eax
+	mov [rDestination], eax
 
 .small0:
-	mkReturnDestinationFromStackNoPop
+	mkAsmlibReturnDestination
 
 	align 16
 	mkAsmlibSSE2ThreeStores 15, 11, 7, 3
-	mov [edx + 1], eax
-	mov [edx], al
-	mkReturnDestinationFromStackNoPop
+	mov [rDestination + 1], eax
+	mov [rDestination], al
+	mkAsmlibReturnDestination
 
 	align 16
 	mkAsmlibSSE2ThreeStores 14, 10, 6, 2
-	mov [edx], ax
-	mkReturnDestinationFromStackNoPop
+	mov [rDestination], ax
+	mkAsmlibReturnDestination
 
 	align 16
 	mkAsmlibSSE2ThreeStores 13, 9, 5, 1
-	mov [edx], al
-	mkReturnDestinationFromStackNoPop
+	mov [rDestination], al
+	mkAsmlibReturnDestination
 
 	align 16
 .jumpTable:
@@ -697,31 +702,13 @@ asmlibSSE2Memset:
 
 
 
-	align 16
-asmlibSSE2v2Memset:
-	mkAsmlibLoadParamsAndBroadcastFill
-
-	cmp ecx, 16
-	jna asmlibSSE2Memset.less16
-
-	mkAsmlibSSE2StartSSE
-	mkAsmLibSSE2RegularLoop movdqa, Normal, 0
-
-.above4Megs:
-	; Use non-temporal stores, same code as above
-	mkAsmLibSSE2RegularLoop movntdq, NonTemporal, 1
-
-
-
-
-
 %macro mkAsmlibAVXPrologAVX 1
 	; Find last 32 bytes boundary
-	mov ecx, eax
-	and ecx, -0x20
+	mov rLength, rax
+	and rLength, -0x20
 
 	; -size of 32-bytes blocks
-	sub edx, ecx
+	sub rDestination, rLength
 	jnb .finish%1	; Jump if not negative
 
 	; Extend value to 256 bits
@@ -731,16 +718,17 @@ asmlibSSE2v2Memset:
 %macro mkAsmlibAVXFinishAVX 1
 
 .finish%1:
-	; The last part from ecx to eax is < 32 bytes. Write 32 bytes with overlap
-	movups [eax - 0x20], xmm0
-	movups [eax - 0x10], xmm0
-	mkReturnDestinationFromStackNoPop
+	; The last part from rLength to rax is < 32 bytes. Write 32 bytes with overlap
+	movups [rax - 0x20], xmm0
+	movups [rax - 0x10], xmm0
+	mkAsmlibReturnDestination
 
 %endmacro
 
 	align 16
 asmlibAVXMemset:
 	mkAsmlibLoadParamsAndBroadcastFill
+	mov rcx, rDestination
 
 .entryAVX512F:
 	cmp ecx, 16
@@ -749,36 +737,36 @@ asmlibAVXMemset:
 	; Length > 16
 	movd xmm0, eax
 	pshufd xmm0, xmm0, 0	; Broadcast c into all bytes of xmm0
-	lea eax, [edx + ecx]	; Point to end
+	lea rax, [rDestination + rLength]	; Point to end
 
-	cmp ecx, 0x20
+	cmp rLength, 0x20
 	jbe .less32
 
 	; Store the first unaligned 16 bytes
 	; It is faster to always write 16 bytes, possibly overlapping with the subsequent regular part, than to make possibly mispredicted branches depending on the size of the first part
-	movups [edx], xmm0
+	movups [rDestination], xmm0
 
 	; Store another 16 bytes, aligned
-	add edx, 0x10
-	and edx, -0x10
-	movaps [edx], xmm0
+	add rDestination, 0x10
+	and rDestination, -0x10
+	movaps [rDestination], xmm0
 
 	; Go to next 32 bytes boundary
-	add edx, 0x10
-	and edx, -0x20
+	add rDestination, 0x10
+	and rDestination, -0x20
 
 	; Check if count very big
-	cmp ecx, 1024 * 1024 * 4
+	cmp rLength, 1024 * 1024 * 4
 	ja .above4Megs	; Use non-temporal stores if count > 4M
 
 	mkAsmlibAVXPrologAVX Normal
 
 .loop32:
 	; Loop through 32-byte blocks
-	; ecx = end of 32-byte blocks
-	; edx = negative index from the end, counting up to zero
-	vmovaps [ecx + edx], ymm0
-	add edx, 0x20
+	; rLength = end of 32-byte blocks
+	; rDestination = negative index from the end, counting up to zero
+	vmovaps [rLength + rDestination], ymm0
+	add rDestination, 0x20
 	jnz .loop32
 
 	vzeroupper
@@ -792,10 +780,10 @@ asmlibAVXMemset:
 	align 16
 .loop32NonTemporal:
 	; Loop through 32-byte blocks
-	; ecx = end of 32-byte blocks
-	; edx = negative index from the end, counting up to zero
-	vmovntps [ecx + edx], ymm0
-	add edx, 0x20
+	; rLength = end of 32-byte blocks
+	; rDestination = negative index from the end, counting up to zero
+	vmovntps [rLength + rDestination], ymm0
+	add rDestination, 0x20
 	jnz .loop32NonTemporal
 
 	sfence
@@ -804,29 +792,21 @@ asmlibAVXMemset:
 
 .less32:
 	; 16 < count <= 32
-	movups [edx], xmm0
+	movups [rDestination], xmm0
 	movups [eax - 0x10], xmm0
-	mkReturnDestinationFromStackNoPop
+	mkAsmlibReturnDestination
 
 
 
 
-
-%macro mkAsmlibAVX512SaveAndBroadcastIntoZmm 0
-
-	push edi
-	mov edi, edx	; Save dest
-	vpbroadcastd zmm0, eax	; Broadcast further into 64 bytes
-
-%endmacro
 
 	align 16
 asmlibAVX512FMemset:
 	mkAsmlibLoadParamsAndBroadcastFill
-	cmp ecx, 0x80
+	cmp rLength, 0x80
 	jbe asmlibAVXMemset.entryAVX512F	; Use AVX code if count <= 0x80
 
-	mkAsmlibAVX512SaveAndBroadcastIntoZmm
+	vpbroadcastd zmm16, eax	; Broadcast further into 64 bytes
 	jmp asmlibAVX512BWMemset.entryAVX512F	; Use AVX512BW code
 
 
@@ -836,50 +816,51 @@ asmlibAVX512FMemset:
 	align 16
 asmlibAVX512BWMemset:
 	mkAsmlibLoadParamsAndBroadcastFill
-	mkAsmlibAVX512SaveAndBroadcastIntoZmm
+	mov rcx, rDestination	; Save destination
+	vpbroadcastd zmm16, eax	; Broadcast further into 64 bytes
 
-	cmp ecx, 0x40
+	cmp rLength, 0x40
 	jbe .less40
 
-	cmp ecx, 0x80
+	cmp rLength, 0x80
 	jbe .less80	; Use simpler code if count <= 0x80
 
 .entryAVX512F:
 	; Count > 0x80
 	; Store first 0x40 bytes
-	vmovdqu64 [edx], zmm0
+	vmovdqu64 [rDestination], zmm0
 
 	; Find first 0x40 boundary
-	add edx, 0x40
-	and edx, -0x40
+	add rDestination, 0x40
+	and rDestination, -0x40
 
 	; Find last 0x40 boundary
-	lea eax, [edi + ecx]
-	and eax, -0x40
-	sub edx, eax	; Negative count from last 0x40 boundary
+	lea rax, [rcx + rLength]
+	and rax, -0x40
+	sub rDestination, rax	; Negative count from last 0x40 boundary
 
 	; Check if count very big
-	cmp ecx, 1024 * 1024 * 4
+	cmp rLength, 1024 * 1024 * 4
 	ja .above4Megs	; Use non-temporal store if count > 4M
 
 .avx512MainLoop:
-	vmovdqa64 [eax + edx], zmm0
-	add edx, 0x40
+	vmovdqa64 [rax + rDestination], zmm0
+	add rDestination, 0x40
 	jnz .avx512MainLoop
 
 .finish:
 	; Remaining 0-0x3F bytes
 	; Overlap previous bytes
-	vmovdqu64 [edi + ecx - 0x40], zmm0
+	vmovdqu64 [rcx + rsi - 0x40], zmm0
 	vzeroupper	; Might not be needed
-	mov eax, edi	; Return destination
-	pop edi
+	mov rax, rcx	; Return destination
+	; vzeroupper not needed when using zmm16-31
 	ret
 
 	align 16
 .above4Megs:
-	vmovntdq [eax + edx], zmm0
-	add edx, 0x40
+	vmovntdq [rax + rDestination], zmm0
+	add rDestination, 0x40
 	jnz .above4Megs
 
 	sfence
@@ -889,26 +870,18 @@ asmlibAVX512BWMemset:
 .less80:
 	; Short counts, AVX512BW-only
 	; Count = 0x41-0x80
-	vmovdqu64 [edx], zmm0
-	add edx, 0x40
-	sub ecx, 0x40
+	vmovdqu64 [rDestination], zmm0
+	add rDestination, 0x40
+	sub rLength, 0x40
 
 .less40:
 	; Count = 0-0x40
-	or eax, -1		; If count = 1-31 | If count = 32-63
-	bzhi eax, eax, ecx	; count 1s        | all 1's
-	kmovd k1, eax
-	xor eax, eax
-	sub ecx, 0x20
-	cmovb ecx, eax	; 0               | count-32
-	dec eax
-	bzhi eax, eax, ecx
-	kmovd k2, eax	; 0               | count-32 1s
-	kunpckdq k3, k2, k1	; Low 32 bits from k1, high 32 bits from k2 : total = count 1s
-	vmovdqu8 [edx]{k3}, zmm0
-	vzeroupper
-	mov eax, edi	; Return destination
-	pop edi
+	or rax, -1		; Generate masks
+	bzhi rax, rax, rLength
+	kmovq k1, rax
+	vmovdqu8 [rDestination]{k1}, zmm16
+	mov rax, rcx	; Return destination
+	; vzeroupper not needed when using zmm16-31
 	ret
 
 

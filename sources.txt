@@ -44,6 +44,7 @@ ASM libs, go look at : nasm, fasm, lzasm, nbasm32, hla, masm, poasm, rosasm, tas
 just lookup libc/asm libs/compilers/kernels on github/gitlab/searchcode
 uboot-exceet (https://git.kontron-electronics.de/linux/uboot-exceet/tree/3c56fb82804d15536f77b245c89156568819ca63)
 MS UCRT (https://github.com/huangqinjin/ucrt, CS and from disk)
+Things from https://en.wikipedia.org/wiki/POSIX#POSIX-oriented_operating_systems)
 ToaruOS (https://github.com/klange/toaruos)
 Wine MSVCRT (https://github.com/wine-mirror/wine/tree/master/dlls/msvcrt)
 ReactOS (https://github.com/reactos/reactos)

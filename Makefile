@@ -1,6 +1,6 @@
 TESTS = memset32 memset64
 
-CXXFLAGS = -std=gnu++2a -W -Wall -Wextra -DHAVE_AVX2
+CXXFLAGS = -std=gnu++2a -W -Wall -Wextra -DHAVE_AVX512BW
 
 ifeq ($(RELEASE), 1)
 	CXXFLAGS += -Ofast -s -flto
