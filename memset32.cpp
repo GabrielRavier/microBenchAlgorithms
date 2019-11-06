@@ -21,6 +21,7 @@ extern "C"
 	mkMemsetDecl(asmlibAVXMemset)
 	mkMemsetDecl(asmlibAVX512FMemset)
 	mkMemsetDecl(asmlibAVX512BWMemset)
+	mkMemsetDecl(kosMK1Memset)
 	mkMemsetDecl(msvc2003Memset)
 	mkMemsetDecl(bytewiseMemset)
 	mkMemsetDecl(minixMemset)
@@ -72,6 +73,8 @@ int main()
 #ifdef HAVE_AVX512BW
 		memsetFunc{asmlibAVX512BWMemset, "asmlib AVX512BW memset"},
 #endif
+
+		memsetFunc{kosMK1Memset, "kOS MK1 memset"},
 
 		memsetFunc{msvc2003Memset, "MSVC 2003 memset"},
 		memsetFunc{bytewiseMemset, "bytewise memset"},

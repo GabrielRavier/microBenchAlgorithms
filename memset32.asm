@@ -17,6 +17,7 @@ global asmlibSSE2v2Memset
 global asmlibAVXMemset	; Not valgrind tested where it uses AVX
 global asmlibAVX512FMemset	; Untested where it uses AVX512F (and not valgrind tested where AVX used)
 global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrind tested where AVX used)
+global kosMK1Memset
 global msvc2003Memset
 global minixMemset
 global freeBsdMemset
@@ -39,6 +40,26 @@ section .text align=16
 	ret
 
 %endmacro
+
+; Cycles taken :
+; i386
+; - pdclibMemset : 49 cycles for n = 0, otherwise 69 + 13n
+; - neatlibcMemset : 39 + 5n cycles
+; i486
+; - pdclibMemset : 26 cycles for n = 0, otherwise 35 + 6n
+; - neatlibcMemset : 22 cycles for n = 0, otherwise 24 + 4n
+; pentium :
+; - pdclibMemset : 13 cycles for n = 0, otherwise 14 + 4n
+; - neatlibcMemset : 21 + n cycles
+; sandybridge :
+; - pdclibMemset : 10 cycles for n = 0, otherwise 15.5 + 3.5n
+; - neatlibcMemset : 10 + n worst case, 10 + 1/16n best case
+; haswell :
+; - pdclibMemset : 7.5 cycles for n = 0, otherwise 11.25 + 2.25n
+; - neatlibcMemset : 8.5 + 0.5n worst case, 8.5 + 1/32n best case
+; Skylake-X :
+; - pdclibMemset : 6.25 cycles for n = 0, otherwise 10.5 + 1.75n
+; - neatlibcMemset : 8.5 + 0.5n worst case, 8.5 + 1/32n best case
 
 	align 16
 pdclibMemset:
@@ -1484,6 +1505,38 @@ asmlibAVX512BWMemset:
 	vmovdqu8 [edx]{k3}, zmm0
 	vzeroupper
 	mov eax, edi	; Return destination
+	pop edi
+	ret
+
+
+
+
+
+	align 16
+kosMK1Memset:
+	push edi
+	mov edi, [esp + 8]
+	mov eax, [esp + 12]
+	mov ecx, [esp + 16]
+	shr ecx, 1
+	jnc .skipStosb
+
+	stosb
+
+.skipStosb:
+	mov ah, al
+	shr ecx, 1
+	jae .skipStosw
+
+	stosw
+
+.skipStosw:
+	mov dx, ax
+	shl eax, 16
+	mov ax, dx
+	rep stosd
+
+	mov eax, edi
 	pop edi
 	ret
 
