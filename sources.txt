@@ -39,12 +39,13 @@ KOSmk4 (https://github.com/GrieferAtWork/KOSmk4)
 alfredklomp (http://www.alfredklomp.com/programming/)
 strchr (https://www.strchr.com/)
 tiny-membench (https://github.com/ssvb/tinymembench)
-Intel/AMD manuals (see pdf website)
+Assembler manuals (See ~/Downloads/Manuals)
 ASM libs, go look at : nasm, fasm, lzasm, nbasm32, hla, masm, poasm, rosasm, tasm, optasm, tma, a86, a386, gas, octasm, goasm, arrowsoft, wolfware (wolf.com), openwatcom (wasm), pass32, yasm, shmasm, jwasm, ngasm, xasm, intasm, tma, arrowasm, chasm, jas, aasm, anasm, djasm, blasm, codex, mingo, bcc, dev86, as86, asm8086, sasm, magicasm, weirdasm, gasm, as, smallasm, xfire, gema, daniela, osimplay, terse (https://wiki.osdev.org/Category:Assemblers)
 just lookup libc/asm libs/compilers/kernels on github/gitlab/searchcode
 uboot-exceet (https://git.kontron-electronics.de/linux/uboot-exceet/tree/3c56fb82804d15536f77b245c89156568819ca63)
 MS UCRT (https://github.com/huangqinjin/ucrt, CS and from disk)
-Things from https://en.wikipedia.org/wiki/POSIX#POSIX-oriented_operating_systems)
+Things from https://en.wikipedia.org/wiki/POSIX#POSIX-oriented_operating_systems
+Things from https://harmful.cat-v.org/software/operating-systems/os-suck
 ToaruOS (https://github.com/klange/toaruos)
 Wine MSVCRT (https://github.com/wine-mirror/wine/tree/master/dlls/msvcrt)
 ReactOS (https://github.com/reactos/reactos)
