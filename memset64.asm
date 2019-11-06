@@ -9,6 +9,9 @@ global newlibMemset
 global muslMemset
 global bionicSSE2SlmMemset
 global asmlibSSE2Memset
+global asmlibAVXMemset
+global asmlibAVX512FMemset	; Untested where it uses AVX512F (and not valgrind tested where AVX used)
+global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrind tested where AVX used)
 global freeBsdMemset
 global freeBsdErmsMemset
 global inlineStringOpGccMemset
@@ -626,7 +629,7 @@ bionicSSE2SlmMemset:
 	; rLength = end of regular part
 	; rDestination = negative index from the end, counting up to zero
 	%1 [rLength + rDestination], xmm0
-	add edx, 0x10
+	add rDestination, 0x10
 	jnz .regularPartLoop%2
 
 %if %3 == 1
@@ -657,7 +660,8 @@ asmlibSSE2Memset:
 	ja .above16
 
 .less16:
-	jmp [.jumpTable + ecx * 4]
+	lea r10, [.jumpTable]	; AVX version comes in here
+	jmp qword [r10 + rLength * 8]
 
 
 	align 16
@@ -686,7 +690,7 @@ asmlibSSE2Memset:
 
 	align 16
 .jumpTable:
-	dd .small0, .small1, .small2, .small3, .small4, .small5, .small6, .small7, .small8, .small9, .small10, .small11, .small12, .small13, .small14, .small15, .small16
+	dq .small0, .small1, .small2, .small3, .small4, .small5, .small6, .small7, .small8, .small9, .small10, .small11, .small12, .small13, .small14, .small15, .small16
 
 	align 16
 .above16:

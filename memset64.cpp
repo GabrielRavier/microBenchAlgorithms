@@ -12,6 +12,10 @@ extern "C"
 	mkMemsetDecl(newlibMemset)
 	mkMemsetDecl(muslMemset)
 	mkMemsetDecl(bionicSSE2SlmMemset)
+	mkMemsetDecl(asmlibSSE2Memset)
+	mkMemsetDecl(asmlibAVXMemset)
+	mkMemsetDecl(asmlibAVX512FMemset)
+	mkMemsetDecl(asmlibAVX512BWMemset)
 	mkMemsetDecl(freeBsdMemset)
 	mkMemsetDecl(freeBsdErmsMemset)
 	mkMemsetDecl(inlineStringOpGccMemset)
@@ -35,6 +39,19 @@ int main()
 
 #ifdef HAVE_SSE2
 		memsetFunc{bionicSSE2SlmMemset, "bionic SSE2 memset"},
+		memsetFunc{asmlibSSE2Memset, "asmlib SSE2 memset"},
+#endif
+
+#ifdef HAVE_AVX
+		memsetFunc{asmlibAVXMemset, "asmlib AVX memset"},
+#endif
+
+#ifdef HAVE_AVX512F
+		memsetFunc{asmlibAVX512FMemset, "asmlib AVX512F memset"},
+#endif
+
+#ifdef HAVE_AVX512BW
+		memsetFunc{asmlibAVX512BWMemset, "asmlib AVX512BW memset"},
 #endif
 
 		memsetFunc{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
