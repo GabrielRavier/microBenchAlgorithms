@@ -1,11 +1,15 @@
+	; r0 = destination
+	; r1 = fill
+	; r2 = length
+
 ENTRY uClibcMemset
-	p0 = r0	; P0 = address
-	p2 = r2	; P2 = count
+	p0 = r0	; p0 = destination
+	p2 = r2	; p2 = length
 	r3 = r0 + r2	; End
 	cc = r2 <= 7(iu)
 	if cc jump .LUtooSmall
 
-	r1 = r1.b(z)	; R1 = fill char
+	r1 = r1.b(z)	; r1 = fill
 	r2 = 3
 	r2 = r0 & r2	; Addr bottom two bits
 	cc = r2 == 0	; Az set if 0

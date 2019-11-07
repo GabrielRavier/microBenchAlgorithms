@@ -1,3 +1,7 @@
+	; gr4 = destination
+	; gr5 = length
+	; gr9 = fill
+
 ENTRY uClibcMemset
 	orcc.p gr10, gr0, gr5, icc3	; gr5 = count
 	andi gr9, #0xFF, gr9

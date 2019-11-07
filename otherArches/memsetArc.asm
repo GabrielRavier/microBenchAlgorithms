@@ -1,3 +1,7 @@
+	; r0 = destination
+	; r1 = fill
+	; r2 = length
+
 .macro mkUClibcMemset name, arc700, archs, ll64, dontUsePrealloc
 
 .if !arc700 && !archs

@@ -1,3 +1,7 @@
+	; r0 = destination
+	; r1 = fill
+	; r2 = length
+
 ENTRY neatlibcMemset
 	mov r12, r0
 
