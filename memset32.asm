@@ -18,6 +18,7 @@ global asmlibAVXMemset	; Not valgrind tested where it uses AVX
 global asmlibAVX512FMemset	; Untested where it uses AVX512F (and not valgrind tested where AVX used)
 global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrind tested where AVX used)
 global kosMK1Memset
+global kosMK3Memset
 global msvc2003Memset
 global minixMemset
 global freeBsdMemset
@@ -1537,6 +1538,42 @@ kosMK1Memset:
 	rep stosd
 
 	mov eax, edi
+	pop edi
+	ret
+
+
+
+
+
+	align 16
+kosMK3Memset:
+	cld
+	push edi
+	push esi
+	mov edi, [esp + 8 + DESTINATION]
+	movzx eax, byte [esp + 8 + FILL]
+	mov ah, al
+	mov cx, ax
+	shl eax, 16
+	mov ax, cx
+	mov ecx, [esp + 8 + LENGTH]
+	push edi
+	mov edx, ecx
+	shr ecx, 2
+	rep stosd
+	jnc .less2BytesLeft	; if (!(length & 2))
+
+	stosw
+
+.less2BytesLeft:
+	test edx, 1
+	jz .noBytesLeft	; if (!(length & 1))
+
+	stosb
+
+.noBytesLeft:
+	pop eax
+	pop esi
 	pop edi
 	ret
 
