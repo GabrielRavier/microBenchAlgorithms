@@ -12,6 +12,7 @@ global asmlibSSE2Memset
 global asmlibAVXMemset
 global asmlibAVX512FMemset	; Untested where it uses AVX512F (and not valgrind tested where AVX used)
 global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrind tested where AVX used)
+global kosMK3Memset
 global freeBsdMemset
 global freeBsdErmsMemset
 global inlineStringOpGccMemset
@@ -886,6 +887,45 @@ asmlibAVX512BWMemset:
 	vmovdqu8 [rDestination]{k1}, zmm16
 	mov rax, rcx	; Return destination
 	; vzeroupper not needed when using zmm16-31
+	ret
+
+
+
+
+
+	align 16
+kosMK3Memset:
+	cld
+	mov rcx, rdx	; length
+	movzx rax, sil
+	mov ah, al
+	mov si, ax
+	shl eax, 16
+	mov ax, si
+	mov esi, eax	; clears upper bytes
+	shl rax, 32
+	or rax, rsi	; rax = fill * 0x101010101010101
+	shr rcx, 3
+	mov rsi, rdi
+	rep stosq
+	jnc .less4BytesLeft	; if (!(length & 4))
+
+	stosd
+
+.less4BytesLeft:
+	test rdx, 2
+	jz .less2BytesLeft	; if (!(length & 2))
+
+	stosw
+
+.less2BytesLeft:
+	test rdx, 1
+	jz .noBytesLeft	; if (!(length & 1))
+
+	stosb
+
+.noBytesLeft:
+	mov rax, rsi
 	ret
 
 
