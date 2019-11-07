@@ -38,7 +38,6 @@ KOSmk3 (https://github.com/GrieferAtWork/KOSmk3)
 KOSmk4 (https://github.com/GrieferAtWork/KOSmk4)
 alfredklomp (http://www.alfredklomp.com/programming/)
 strchr (https://www.strchr.com/)
-tiny-membench (https://github.com/ssvb/tinymembench)
 Assembler manuals (See ~/Downloads/Manuals)
 ASM libs, go look at : nasm, fasm, lzasm, nbasm32, hla, masm, poasm, rosasm, tasm, optasm, tma, a86, a386, gas, octasm, goasm, arrowsoft, wolfware (wolf.com), openwatcom (wasm), pass32, yasm, shmasm, jwasm, ngasm, xasm, intasm, tma, arrowasm, chasm, jas, aasm, anasm, djasm, blasm, codex, mingo, bcc, dev86, as86, asm8086, sasm, magicasm, weirdasm, gasm, as, smallasm, xfire, gema, daniela, osimplay, terse (https://wiki.osdev.org/Category:Assemblers)
 just lookup libc/asm libs/compilers/kernels on github/gitlab/searchcode
