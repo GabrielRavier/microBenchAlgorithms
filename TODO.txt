@@ -22,6 +22,7 @@ memset:
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-thumb2.S (2.53 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-thumb.S (2.68 KB)
 		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/krait/bionic/memset.S (2.85 KB)
+		https://raw.githubusercontent.com/genesi/imx-libc-neon/master/memset.S (3.35 KB)
 		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/generic/bionic/memset.S (3.65 KB)
 		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/cortex-a7/bionic/memset.S (4.94 KB)
 		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/cortex-a9/bionic/memset.S (5.02 KB)
