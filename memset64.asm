@@ -13,6 +13,7 @@ global asmlibAVXMemset
 global asmlibAVX512FMemset	; Untested where it uses AVX512F (and not valgrind tested where AVX used)
 global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrind tested where AVX used)
 global kosMK3Memset
+global dklibcMemset
 global freeBsdMemset
 global freeBsdErmsMemset
 global inlineStringOpGccMemset
@@ -926,6 +927,29 @@ kosMK3Memset:
 
 .noBytesLeft:
 	mov rax, rsi
+	ret
+
+
+
+
+
+	align 16
+dklibcMemset:
+	pushfq
+	push rcx
+	push rdi
+	push rdi
+
+	mov rax, rsi
+	mov rcx, rdx
+	cld
+
+	repne stosb
+
+	pop rax
+	pop rdi
+	pop rcx
+	popfq
 	ret
 
 
