@@ -19,6 +19,7 @@ global asmlibAVX512FMemset	; Untested where it uses AVX512F (and not valgrind te
 global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrind tested where AVX used)
 global kosMK1Memset
 global kosMK3Memset
+global dklibcMemset
 global msvc2003Memset
 global minixMemset
 global freeBsdMemset
@@ -1574,6 +1575,23 @@ kosMK3Memset:
 .noBytesLeft:
 	pop eax
 	pop esi
+	pop edi
+	ret
+
+
+
+
+
+	align 16
+dklibcMemset:
+	push edi
+	mov edi, [esp + 4 + DESTINATION]
+	mov edx, edi
+	mov eax, [esp + 4 + FILL]
+	mov ecx, [esp + 4 + LENGTH]
+	cld
+	rep stosb
+	mov eax, edx
 	pop edi
 	ret
 

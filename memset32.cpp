@@ -23,6 +23,7 @@ extern "C"
 	mkMemsetDecl(asmlibAVX512BWMemset)
 	mkMemsetDecl(kosMK1Memset)
 	mkMemsetDecl(kosMK3Memset)
+	mkMemsetDecl(dklibcMemset)
 	mkMemsetDecl(msvc2003Memset)
 	mkMemsetDecl(bytewiseMemset)
 	mkMemsetDecl(minixMemset)
@@ -77,7 +78,7 @@ int main()
 
 		memsetFunc{kosMK1Memset, "kOS MK1 memset"},
 		memsetFunc{kosMK3Memset, "kOS MK3 memset"},
-
+		memsetFunc{dklibcMemset, "dklibc memset"},
 		memsetFunc{msvc2003Memset, "MSVC 2003 memset"},
 		memsetFunc{bytewiseMemset, "bytewise memset"},
 		memsetFunc{minixMemset, "minix memset"},
