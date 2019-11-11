@@ -193,7 +193,7 @@ template <typename T> void benchFunctions(T funcs, std::ostream& out)
 	std::vector<benchBatchInfo> results;
 	for (auto sizeTime : sizesTimes)
 	{
-		//sizeTime.second /= 30;
+		sizeTime.second /= 30;
 		std::vector<benchResult> resultsCurrentSizeAligned;
 		std::vector<benchResult> resultsCurrentSizeUnaligned;
 		for (auto func : funcs)
