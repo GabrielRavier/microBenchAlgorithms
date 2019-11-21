@@ -20,6 +20,7 @@ global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrin
 global kosMK1Memset
 global kosMK3Memset
 global dklibcMemset
+global stringAsmMemset
 global msvc2003Memset
 global minixMemset
 global freeBsdMemset
@@ -1593,6 +1594,28 @@ dklibcMemset:
 	rep stosb
 	mov eax, edx
 	pop edi
+	ret
+
+
+
+
+
+	align 16
+stringAsmMemset:
+	mov eax, [esp + 4]
+	mov edx, [esp + 12]
+	cmp edx, 0
+	je .end
+
+	mov ecx, [esp + 8]
+
+.loop:
+	dec edx
+	mov [eax + edx], cl
+	cmp edx, 0
+	jne .loop
+
+.end:
 	ret
 
 
