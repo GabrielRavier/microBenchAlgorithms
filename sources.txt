@@ -42,9 +42,9 @@ Assembler manuals (See ~/Downloads/Manuals)
 imw-libc-neon (https://github.com/genesi/imx-libc-neon)
 dklibc (https://github.com/dklibc/dklibc)
 sdcc lib (https://github.com/swegener/sdcc)
+RTE memcpy (https://github.com/efficient/fasst/blob/master/util/rte_memcpy.h)
 FreeJ memcpy (https://raw.githubusercontent.com/jaromil/FreeJ/master/src/fastmemcpy.cpp)
 CheezeCake string asm (https://github.com/CheezeCake/string.asm)
-Apple opensource (https://opensource.apple.com/source/Libc/Libc-166/string.subproj/, https://opensource.apple.com/source/boot/boot-111/gen/libsa/)
 JOS (https://github.com/clann24/jos)
 u-boot (https://github.com/ARM-software/u-boot)
 vboxhsm (https://github.com/OSLL/vboxhsm)
@@ -56,12 +56,27 @@ Escape (https://github.com/Nils-TUD/Escape)
 freedom-bootloader (https://github.com/sifive/freedom-u540-c000-bootloader)
 uboot-exceet (https://git.kontron-electronics.de/linux/uboot-exceet/tree/3c56fb82804d15536f77b245c89156568819ca63)
 MS UCRT (https://github.com/huangqinjin/ucrt, CS and from disk)
+Wii CRT (PMTTYD)
 Things from https://en.wikipedia.org/wiki/POSIX#POSIX-oriented_operating_systems
 Things from https://harmful.cat-v.org/software/operating-systems/os-suck
 ToaruOS (https://github.com/klange/toaruos)
 Wine MSVCRT (https://github.com/wine-mirror/wine/tree/master/dlls/msvcrt)
 ReactOS (https://github.com/reactos/reactos)
 MINIX 1 (https://github.com/gdevic/minix1/)
+MINIX 2
+MINIX 3
+MINIX >3
+Integrity
+PikeOS
+Symbian
+L4Linux
+Singularity
+K42
+Mac OS X
+HURD
+Coyotos
+Xen (hypervisor)
+Trango (hypervisor)
 OpenQNX (https://github.com/vocho/openqnx)
 skiboot (https://github.com/open-power/skiboot)
 Illumus gate (https://github.com/illumos/illumos-gate)
@@ -87,6 +102,7 @@ Knight OS (https://github.com/KnightOS/kernel)
 XeOS (https://github.com/macmade/LibC-String-Optimisations)
 MINIX 3 (https://github.com/Stichting-MINIX-Research-Foundation/minix)
 geos (https://github.com/mist64/geos/tree/fd4d73a79dee4db80a08da4e4e277f85277d59f1)
+Fuchsia Zircon kernel (https://fuchsia.googlesource.com/fuchsia/+/master/zircon/kernel/lib/libc/string/)
 Darwin kernel (https://github.com/apple/darwin-xnu)
 linux (https://github.com/torvalds/linux)
 GCC inline stringops
