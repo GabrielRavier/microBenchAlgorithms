@@ -14,6 +14,8 @@ global asmlibAVX512FMemset	; Untested where it uses AVX512F (and not valgrind te
 global asmlibAVX512BWMemset	; Untested where it uses AVX512F/BW (and not valgrind tested where AVX used)
 global kosMK3Memset
 global dklibcMemset
+global stringAsmMemset
+global josMemset
 global freeBsdMemset
 global freeBsdErmsMemset
 global inlineStringOpGccMemset
@@ -950,6 +952,73 @@ dklibcMemset:
 	pop rdi
 	pop rcx
 	popfq
+	ret
+
+
+
+
+
+	align 16
+stringAsmMemset:
+	mov rax, rdi
+	cmp rdx, 0
+	je .end
+
+	mov rcx, rsi
+
+.loop:
+	dec rdx
+	mov [rdi + rdx], cl
+	cmp rdx, 0
+	jne .loop
+
+.end:
+	ret
+
+
+
+
+
+	align 16
+josMemset:
+	mov r8, rdi
+	mov rcx, rdx
+	test rdx, rdx
+	je .return
+
+	mov rax, rdi
+	or rax, rdx
+	test al, 3
+	jne .notMul4
+
+	movzx esi, sil
+	mov eax, esi
+	mov edi, esi
+	sal edi, 16
+	sal eax, 24
+	or eax, edi
+	mov edx, esi
+	sal edx, 8
+	or esi, eax
+	or esi, edx
+	shr rcx, 2
+
+	mov rdi, r8
+	mov eax, esi
+	cld
+	rep stosd
+
+.return:
+	mov rax, r8
+	ret
+
+	align 16
+.notMul4:
+	mov eax, esi
+	cld
+	rep stosb
+
+	mov rax, r8
 	ret
 
 

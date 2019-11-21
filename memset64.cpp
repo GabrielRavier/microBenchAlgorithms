@@ -18,6 +18,8 @@ extern "C"
 	mkMemsetDecl(asmlibAVX512BWMemset)
 	mkMemsetDecl(kosMK3Memset)
 	mkMemsetDecl(dklibcMemset)
+	mkMemsetDecl(stringAsmMemset)
+	mkMemsetDecl(josMemset)
 	mkMemsetDecl(freeBsdMemset)
 	mkMemsetDecl(freeBsdErmsMemset)
 	mkMemsetDecl(inlineStringOpGccMemset)
@@ -58,6 +60,10 @@ int main()
 
 		memsetFunc{kosMK3Memset, "kOS MK3 memset"},
 		memsetFunc{dklibcMemset, "dklibc memset"},
+		memsetFunc{stringAsmMemset, "string.asm memset"},
+		memsetFunc{josMemset, "jos memset"},
+		memsetFunc{freeBsdMemset, "FreeBSD memset"},
+		memsetFunc{freeBsdErmsMemset, "FreeBSD ERMS memset"},
 		memsetFunc{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},
 		memsetFunc{inlineStringOpGccSkylakeMemset, "-minline-all-stringops -march=skylake gcc memset"}
 	};
