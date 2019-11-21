@@ -122,6 +122,7 @@ inline void doOneBench(bool destinationAlign, size_t size, size_t times, memsetF
 	result.funcName = memsetPtr.second;
 
 	usleep(2000);
+	memset(dest, 0, size);
 	auto currentTime = gettime();
 	for (size_t i = 0; i < times; ++i)
 		memsetPtr.first(dest, 0, size);
