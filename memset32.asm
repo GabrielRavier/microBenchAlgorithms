@@ -21,6 +21,8 @@ global kosMK1Memset
 global kosMK3Memset
 global dklibcMemset
 global stringAsmMemset
+global josMemset
+global orangeCMemset
 global msvc2003Memset
 global minixMemset
 global freeBsdMemset
@@ -1616,6 +1618,112 @@ stringAsmMemset:
 	jne .loop
 
 .end:
+	ret
+
+
+
+
+
+	align 16
+josMemset:
+	push edi
+	push esi
+	mov ecx, [esp + 8 + LENGTH]
+	mov edi, [esp + 8 + DESTINATION]
+	test ecx, ecx
+	je .return
+
+	mov eax, [esp + 8 + FILL]
+	mov edx, edi
+	or edx, ecx
+	test dl, 3
+	je .aligned
+
+	cld
+	rep stosb
+
+.return:
+	mov eax, edi
+	pop esi
+	pop edi
+	ret
+
+	align 16
+.aligned:
+	movzx edx, al
+	shl eax, 24
+	mov esi, edx
+	or eax, edx
+	shl edx, 16
+	shl esi, 8
+	or eax, edx
+	or eax, esi
+	shr ecx, 2
+	cld
+	rep stosd
+
+	mov eax, edi
+	pop esi
+	pop edi
+	ret
+
+
+
+
+
+	align 16
+orangeCMemset:
+	push ebp
+	mov ebp, esp
+	mov ecx, [ebp + 4 + LENGTH]
+	jecxz .return
+
+	mov eax, [ebp + 4 + FILL]
+	mov ah, al
+	movzx edx, ax
+	shl eax, 16
+	add eax, edx
+
+	cld
+	mov edx, [ebp + 4 + DESTINATION]
+	push edi
+	mov edi, edx
+	xchg ecx, edx
+	and ecx, 3	; Align on a dword boundary
+	jecxz .aligned
+
+	neg ecx
+	add ecx, 4
+
+.alignLoop:
+	stosb
+	dec edx
+	jz .returnWithPopEDI
+	loop .alignLoop
+
+.aligned:
+	mov ecx, edx
+	push ecx
+	shr ecx, 2
+	rep stosd
+	pop ecx
+	shl cl, 1
+	jnc .noone
+
+	stosb
+
+.noone:
+	shr cl, 1
+	jnc .returnWithPopEDI
+
+	stosw
+
+.returnWithPopEDI:
+	pop edi
+
+.return:
+	mov eax, [ebp + 4 + DESTINATION]
+	pop ebp
 	ret
 
 

@@ -25,6 +25,8 @@ extern "C"
 	mkMemsetDecl(kosMK3Memset)
 	mkMemsetDecl(dklibcMemset)
 	mkMemsetDecl(stringAsmMemset)
+	mkMemsetDecl(josMemset)
+	mkMemsetDecl(orangeCMemset)
 	mkMemsetDecl(msvc2003Memset)
 	mkMemsetDecl(bytewiseMemset)
 	mkMemsetDecl(minixMemset)
@@ -81,6 +83,8 @@ int main()
 		memsetFunc{kosMK3Memset, "kOS MK3 memset"},
 		memsetFunc{dklibcMemset, "dklibc memset"},
 		memsetFunc{stringAsmMemset, "string.asm memset"},
+		memsetFunc{josMemset, "jOS memset"},
+		memsetFunc{orangeCMemset, "Orange C memset"},
 		memsetFunc{msvc2003Memset, "MSVC 2003 memset"},
 		memsetFunc{bytewiseMemset, "bytewise memset"},
 		memsetFunc{minixMemset, "minix memset"},
