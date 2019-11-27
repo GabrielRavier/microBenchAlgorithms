@@ -46,6 +46,7 @@ RTE memcpy (https://github.com/efficient/fasst/blob/master/util/rte_memcpy.h)
 FreeJ memcpy (https://raw.githubusercontent.com/jaromil/FreeJ/master/src/fastmemcpy.cpp)
 CheezeCake string asm (https://github.com/CheezeCake/string.asm)
 JOS (https://github.com/clann24/jos)
+OrangeC (https://github.com/LADSoft/OrangeC)
 u-boot (https://github.com/ARM-software/u-boot)
 vboxhsm (https://github.com/OSLL/vboxhsm)
 cores (https://github.com/PaulStoffregen/cores)
@@ -62,6 +63,12 @@ Things from https://harmful.cat-v.org/software/operating-systems/os-suck
 ToaruOS (https://github.com/klange/toaruos)
 Wine MSVCRT (https://github.com/wine-mirror/wine/tree/master/dlls/msvcrt)
 ReactOS (https://github.com/reactos/reactos)
+Idris
+Coherent
+Uniflex
+genode (https://github.com/genodelabs/genode)
+L4OS (https://github.com/dterei/L4OS)
+eduOS (https://github.com/RWTH-OS/eduOS)
 MINIX 1 (https://github.com/gdevic/minix1/)
 MINIX 2
 MINIX 3
@@ -72,11 +79,18 @@ Symbian
 L4Linux
 Singularity
 K42
+Chorus
+Amiga
+Amoeba
+TOY
 Mac OS X
 HURD
 Coyotos
 Xen (hypervisor)
 Trango (hypervisor)
+Nooks
+Coherent UNIX
+BSD-detox
 OpenQNX (https://github.com/vocho/openqnx)
 skiboot (https://github.com/open-power/skiboot)
 Illumus gate (https://github.com/illumos/illumos-gate)
@@ -86,6 +100,7 @@ Bitrig (https://github.com/bitrig/bitrig)
 DragonFly BSD (https://github.com/DragonFlyBSD/DragonFlyBSD)
 Lite BSD (https://github.com/sergev/LiteBSD)
 Open BSD (https://github.com/openbsd/src)
+Midnight BSD
 Original BSD (https://github.com/weiss/original-bsd)
 NT OS Kernel (https://github.com/Zer0Mem0ry/ntoskrnl)
 Plan 9 (https://github.com/0intro/plan9)
