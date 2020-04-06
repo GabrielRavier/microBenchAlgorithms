@@ -46,26 +46,6 @@ section .text align=16
 
 %endmacro
 
-; Cycles taken :
-; i386
-; - pdclibMemset : 49 cycles for n = 0, otherwise 69 + 13n
-; - neatlibcMemset : 39 + 5n cycles
-; i486
-; - pdclibMemset : 26 cycles for n = 0, otherwise 35 + 6n
-; - neatlibcMemset : 22 cycles for n = 0, otherwise 24 + 4n
-; pentium :
-; - pdclibMemset : 13 cycles for n = 0, otherwise 14 + 4n
-; - neatlibcMemset : 21 + n cycles
-; sandybridge :
-; - pdclibMemset : 10 cycles for n = 0, otherwise 15.5 + 3.5n
-; - neatlibcMemset : 10 + n worst case, 10 + 1/16n best case
-; haswell :
-; - pdclibMemset : 7.5 cycles for n = 0, otherwise 11.25 + 2.25n
-; - neatlibcMemset : 8.5 + 0.5n worst case, 8.5 + 1/32n best case
-; Skylake-X :
-; - pdclibMemset : 6.25 cycles for n = 0, otherwise 10.5 + 1.75n
-; - neatlibcMemset : 8.5 + 0.5n worst case, 8.5 + 1/32n best case
-
 	align 16
 pdclibMemset:
 	push esi
