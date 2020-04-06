@@ -18,8 +18,10 @@ memset:
 		https://git.musl-libc.org/cgit/musl/plain/src/string/arm/__aeabi_memset.s (578 B)
 		https://raw.githubusercontent.com/bminor/glibc/5cb226d7e4e710939cff7288bf9970cb52ec0dfa/sysdeps/arm/memset.S (1.71 KB)
 		https://raw.githubusercontent.com/Olde-Skuul/doom3do/master/lib/string/memset.s (2.24 KB)
+		https://raw.githubusercontent.com/ARM-software/u-boot/master/arch/arm/lib/memset.S (2.30 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-arm.S (2.52 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-thumb2.S (2.53 KB)
+		https://raw.githubusercontent.com/PaulStoffregen/cores/master/teensy4/memset.S (2.59 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/arm/aeabi_memset-thumb.S (2.68 KB)
 		https://raw.githubusercontent.com/aosp-mirror/platform_bionic/master/libc/arch-arm/krait/bionic/memset.S (2.85 KB)
 		https://raw.githubusercontent.com/genesi/imx-libc-neon/master/memset.S (3.35 KB)
@@ -54,6 +56,7 @@ memset:
 		https://raw.githubusercontent.com/cc65/cc65/master/libsrc/pce/memset.s (2.32 KB)
 		https://raw.githubusercontent.com/cc65/cc65/master/libsrc/common/memset.s (3.1 KB)
 	m68k:
+		https://raw.githubusercontent.com/LADSoft/OrangeC/master/src/clibs/string/68k/memcpy.src (1.74 KB)
 		https://raw.githubusercontent.com/bminor/newlib/master/newlib/libc/machine/m68k/memset.S (2.44 KB)
 	mcs51:
 		https://raw.githubusercontent.com/KnightOS/kcc/master/device/lib/_memset.c (5.34 KB)

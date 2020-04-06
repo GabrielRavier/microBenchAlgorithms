@@ -16,6 +16,7 @@ global kosMK3Memset
 global dklibcMemset
 global stringAsmMemset
 global josMemset
+global vboxMemset
 global freeBsdMemset
 global freeBsdErmsMemset
 global inlineStringOpGccMemset
@@ -1019,6 +1020,37 @@ josMemset:
 	rep stosb
 
 	mov rax, r8
+	ret
+
+
+
+
+
+	align 16
+vboxMemset:
+	cld
+	mov r10, rDestination
+	movzx eax, rFill8
+	cmp rLength, 0x20
+	jb .doBytes
+
+	; eax = {al, al, al, al}
+	; rdx = {eax, eax}
+	movzx esi, rFill8
+	mov rax, 0x101010101010101
+	imul rax, rsi
+
+	mov rcx, rLength
+	shr rcx, 3
+	rep stosq
+
+	and rdx, 7
+
+.doBytes:
+	mov rcx, rLength
+	rep stosb
+
+	mov rax, r10
 	ret
 
 

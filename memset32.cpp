@@ -27,6 +27,7 @@ extern "C"
 	mkMemsetDecl(stringAsmMemset)
 	mkMemsetDecl(josMemset)
 	mkMemsetDecl(orangeCMemset)
+	mkMemsetDecl(vboxMemset)
 	mkMemsetDecl(msvc2003Memset)
 	mkMemsetDecl(bytewiseMemset)
 	mkMemsetDecl(minixMemset)
@@ -85,6 +86,7 @@ int main()
 		memsetFunc{stringAsmMemset, "string.asm memset"},
 		memsetFunc{josMemset, "jOS memset"},
 		memsetFunc{orangeCMemset, "Orange C memset"},
+		memsetFunc{vboxMemset, "VirtualBox memset"},
 		memsetFunc{msvc2003Memset, "MSVC 2003 memset"},
 		memsetFunc{bytewiseMemset, "bytewise memset"},
 		memsetFunc{minixMemset, "minix memset"},

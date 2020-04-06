@@ -20,6 +20,7 @@ extern "C"
 	mkMemsetDecl(dklibcMemset)
 	mkMemsetDecl(stringAsmMemset)
 	mkMemsetDecl(josMemset)
+	mkMemsetDecl(vboxMemset)
 	mkMemsetDecl(freeBsdMemset)
 	mkMemsetDecl(freeBsdErmsMemset)
 	mkMemsetDecl(inlineStringOpGccMemset)
@@ -62,6 +63,7 @@ int main()
 		memsetFunc{dklibcMemset, "dklibc memset"},
 		memsetFunc{stringAsmMemset, "string.asm memset"},
 		memsetFunc{josMemset, "jos memset"},
+		memsetFunc{vboxMemset, "VirtualBox memset"},
 		memsetFunc{freeBsdMemset, "FreeBSD memset"},
 		memsetFunc{freeBsdErmsMemset, "FreeBSD ERMS memset"},
 		memsetFunc{inlineStringOpGccMemset, "-minline-all-stringops gcc memset"},

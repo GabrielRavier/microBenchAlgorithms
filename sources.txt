@@ -50,7 +50,7 @@ OrangeC (https://github.com/LADSoft/OrangeC)
 u-boot (https://github.com/ARM-software/u-boot)
 vboxhsm (https://github.com/OSLL/vboxhsm)
 cores (https://github.com/PaulStoffregen/cores)
-libeabi-cortexm0 (https://github.com/bobbl/libaeabi-cortexm0)
+libeabi-cortexm0 (https://github.com/bobbl/libaeabi-cortexm0)   // Currently doing this
 vector-edk (https://github.com/hackedteam/vector-edk)
 cifra (https://github.com/ctz/cifra)
 Escape (https://github.com/Nils-TUD/Escape)
